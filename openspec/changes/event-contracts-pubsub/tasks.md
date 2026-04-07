@@ -27,21 +27,21 @@
 
 ## 4. Control Center API — ride.status-changed Publisher
 
-- [ ] 4.1 In `RideWorkflow`, publish a `RideStatusChangedEvent` via `DaprClient.PublishEventAsync("themepark-pubsub", "ride.status-changed", ...)` on every ride status transition
-- [ ] 4.2 Ensure `WorkflowStep` is populated with the activity/step name on each publish call
-- [ ] 4.3 Wire the `ride.status-changed` event to the SSE channel so connected frontend clients receive the payload in the SSE `data` field
+- [x] 4.1 In `RideWorkflow`, publish a `RideStatusChangedEvent` via `DaprClient.PublishEventAsync("themepark-pubsub", "ride.status-changed", ...)` on every ride status transition
+- [x] 4.2 Ensure `WorkflowStep` is populated with the activity/step name on each publish call
+- [x] 4.3 Wire the `ride.status-changed` event to the SSE channel so connected frontend clients receive the payload in the SSE `data` field
 
 ## 5. Publisher Service Updates
 
-- [ ] 5.1 Update Weather Service to publish `WeatherAlertEvent` (from `ThemePark.EventContracts`) to `weather.alert` when severity is `Mild` or `Severe`
-- [ ] 5.2 Update Mascot Service to publish `MascotInRestrictedZoneEvent` to `mascot.in-restricted-zone` on intrusion detection
-- [ ] 5.3 Update Ride Service to publish `RideMalfunctionEvent` to `ride.malfunction` on fault detection
-- [ ] 5.4 Update Maintenance Service to publish `MaintenanceRequestedEvent` to `maintenance.requested` on `POST /maintenance/request`
-- [ ] 5.5 Update Maintenance Service to publish `MaintenanceCompletedEvent` to `maintenance.completed` on `POST /maintenance/{id}/complete`
+- [x] 5.1 Update Weather Service to publish `WeatherAlertEvent` (from `ThemePark.EventContracts`) to `weather.alert` when severity is `Mild` or `Severe`
+- [x] 5.2 Update Mascot Service to publish `MascotInRestrictedZoneEvent` to `mascot.in-restricted-zone` on intrusion detection
+- [x] 5.3 Update Ride Service to publish `RideMalfunctionEvent` to `ride.malfunction` on fault detection
+- [x] 5.4 Update Maintenance Service to publish `MaintenanceRequestedEvent` to `maintenance.requested` on `POST /maintenance/request`
+- [x] 5.5 Update Maintenance Service to publish `MaintenanceCompletedEvent` to `maintenance.completed` on `POST /maintenance/{id}/complete`
 
 ## 6. Integration Tests
 
 - [ ] 6.1 Write an xUnit integration test that publishes a `WeatherAlertEvent` to a test Dapr pub/sub component and asserts the Control Center subscriber endpoint is invoked with the correct deserialized payload
 - [ ] 6.2 Write an xUnit integration test for `maintenance.completed` that verifies the waiting workflow step is unblocked after the event is received
-- [ ] 6.3 Write a unit test for the `ThemePark.EventContracts` serialisation helper asserting camelCase property names and string enum values in the serialised JSON
-- [ ] 6.4 Write a unit test asserting that a `WeatherAlertEvent` with severity `Calm` is never published by Weather Service
+- [x] 6.3 Write a unit test for the `ThemePark.EventContracts` serialisation helper asserting camelCase property names and string enum values in the serialised JSON
+- [x] 6.4 Write a unit test asserting that a `WeatherAlertEvent` with severity `Calm` is never published by Weather Service
