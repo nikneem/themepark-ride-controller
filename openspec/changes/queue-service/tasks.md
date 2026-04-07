@@ -31,6 +31,6 @@
 
 ## 7. Tests
 
-- [ ] 7.1 Unit-test `GET /queue/{rideId}` handler: empty queue returns zeros; populated queue returns correct counts and `estimatedWaitMinutes`
-- [ ] 7.2 Unit-test `POST /queue/{rideId}/load`: full capacity load, partial load (fewer than capacity), empty queue load, and VIP count accuracy
-- [ ] 7.3 Unit-test `POST /queue/{rideId}/simulate-queue`: correct passenger count generated, queue replaced not appended, unique passenger IDs, feature flag off returns 404
+- [x] 7.1 Unit-test `GET /queue/{rideId}` handler: empty queue returns zeros; populated queue returns correct counts and `estimatedWaitMinutes`
+- [x] 7.2 Unit-test `POST /queue/{rideId}/load`: full capacity load, partial load (fewer than capacity), empty queue load, and VIP count accuracy
+- [x] 7.3 Unit-test `POST /queue/{rideId}/simulate-queue`: correct passenger count generated, queue replaced not appended, unique passenger IDs, feature flag off returns 404
