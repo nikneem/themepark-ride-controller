@@ -3,6 +3,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Aspire\ThemePark.Aspire.ServiceDefaults\ThemePark.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Shared\ThemePark.EventContracts\ThemePark.EventContracts.csproj" />
+    <ProjectReference Include="..\ThemePark.Refunds\ThemePark.Refunds.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
   </ItemGroup>
 
   <PropertyGroup>
