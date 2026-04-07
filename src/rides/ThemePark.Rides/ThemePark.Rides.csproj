@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ThemePark.Shared\ThemePark.Shared.csproj" />
+    <ProjectReference Include="..\ThemePark.Rides.Abstractions\ThemePark.Rides.Abstractions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

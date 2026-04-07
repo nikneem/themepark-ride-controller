@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ThemePark.Shared\ThemePark.Shared.csproj" />
+    <ProjectReference Include="..\ThemePark.Queue.Abstractions\ThemePark.Queue.Abstractions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

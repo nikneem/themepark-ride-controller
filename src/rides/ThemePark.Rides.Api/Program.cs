@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
-builder.Services.AddScoped<IRideStateStore, DaprRideStateStore>();
+builder.Services.AddScoped<ThemePark.Rides.Api._Shared.IRideStateStore, DaprRideStateStore>();
 builder.Services.AddScoped<IRideStateRepository, RideStateRepository>();
 builder.Services.AddScoped<RideCommandHandlers>();
 builder.Services.AddHostedService<RideSeedService>();
