@@ -7,3 +7,19 @@ public sealed record RideTransitionInput(string RideId, RideStatus TargetStatus)
 
 /// <summary>Output from workflow activities after a successful state transition.</summary>
 public sealed record RideTransitionOutput(string RideId, RideStatus NewStatus);
+
+/// <summary>A passenger on a ride, used for refund calculation on failure.</summary>
+public sealed record RidePassenger(string PassengerId, bool IsVip);
+
+/// <summary>Input to start a RideWorkflow instance.</summary>
+public sealed record RideWorkflowInput(
+    string RideId,
+    IReadOnlyList<RidePassenger> Passengers,
+    string RefundReason = "OperationalDecision");
+
+/// <summary>Final output of a RideWorkflow instance.</summary>
+public sealed record RideWorkflowOutput(
+    string RideId,
+    RideStatus FinalStatus,
+    Guid? RefundBatchId = null);
+

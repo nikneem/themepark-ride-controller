@@ -3,6 +3,9 @@ using System.Threading.Channels;
 using Dapr;
 using ThemePark.ControlCenter.Infrastructure;
 using ThemePark.ControlCenter.PubSub;
+using ThemePark.ControlCenter.Workflow;
+using Dapr.Workflow;
+using ThemePark.ControlCenter.Workflow.Activities;
 using ThemePark.EventContracts.Events;
 using ThemePark.EventContracts.Serialization;
 using ThemePark.Rides.Infrastructure;
@@ -11,6 +14,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
+
+// Dapr Workflow — registers RideWorkflow and all activities
+builder.Services.AddDaprWorkflow(options =>
+{
+    options.RegisterWorkflow<RideWorkflow>();
+    options.RegisterActivity<StartPreFlightActivity>();
+    options.RegisterActivity<StartLoadingActivity>();
+    options.RegisterActivity<StartRunActivity>();
+    options.RegisterActivity<PauseRideActivity>();
+    options.RegisterActivity<ResumeRideActivity>();
+    options.RegisterActivity<EnterMaintenanceActivity>();
+    options.RegisterActivity<StartResumingActivity>();
+    options.RegisterActivity<CompleteRideActivity>();
+    options.RegisterActivity<FailRideActivity>();
+    options.RegisterActivity<ResetRideActivity>();
+    options.RegisterActivity<IssueRefundActivity>();
+});
 
 // Singleton channel that fans ride.status-changed pub/sub events to SSE clients.
 var statusChannel = Channel.CreateUnbounded<RideStatusChangedEvent>(
