@@ -1,5 +1,7 @@
+using ThemePark.Rides.Api._Shared;
 using ThemePark.Rides.Api.Features.Rides;
 using ThemePark.Rides.Api.Infrastructure;
+using ThemePark.Rides.Api.Startup;
 using ThemePark.Rides.Exceptions;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared.Enums;
@@ -8,8 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
+builder.Services.AddScoped<IRideStateStore, DaprRideStateStore>();
 builder.Services.AddScoped<IRideStateRepository, RideStateRepository>();
 builder.Services.AddScoped<RideCommandHandlers>();
+builder.Services.AddHostedService<RideSeedService>();
 
 var app = builder.Build();
 
