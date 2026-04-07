@@ -3,6 +3,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\ThemePark.Shared\ThemePark.Shared.csproj" />
     <ProjectReference Include="..\..\Shared\ThemePark.EventContracts\ThemePark.EventContracts.csproj" />
+    <ProjectReference Include="..\..\rides\ThemePark.Rides\ThemePark.Rides.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapr.Client" Version="1.17.7" />
+    <PackageReference Include="Dapr.Workflow" Version="1.17.7" />
   </ItemGroup>
 
   <PropertyGroup>
