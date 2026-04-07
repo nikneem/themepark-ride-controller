@@ -30,5 +30,5 @@
 
 ## 6. Documentation & Cleanup
 
-- [ ] 6.1 Update `README` or service-level docs with endpoint descriptions, Dapr topic, and configuration keys
-- [ ] 6.2 Verify OpenTelemetry traces are emitted for timer ticks and pub/sub publishes (ADR-0008 compliance)
+- [x] 6.1 Update `README` or service-level docs with endpoint descriptions, Dapr topic, and configuration keys
+- [x] 6.2 Verify OpenTelemetry traces are emitted for timer ticks and pub/sub publishes (ADR-0008 compliance)
