@@ -1,9 +1,9 @@
 using ThemePark.Mascots.Api.Models;
-using ThemePark.Mascots.Api.State;
+using ThemePark.Mascots.State;
 
 namespace ThemePark.Mascots.Api.GetMascots;
 
-public sealed class GetMascotsHandler(MascotStateStore store)
+public sealed class GetMascotsHandler(IMascotStateStore store)
 {
     public IReadOnlyList<MascotDto> Handle() =>
         store.GetAll()

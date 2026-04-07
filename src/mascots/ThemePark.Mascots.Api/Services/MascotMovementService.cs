@@ -1,13 +1,13 @@
 using Dapr.Client;
 using ThemePark.EventContracts.Events;
-using ThemePark.Mascots.Api.State;
+using ThemePark.Mascots.State;
 using ThemePark.Mascots.Zones;
 
 namespace ThemePark.Mascots.Api.Services;
 
 public sealed class MascotMovementService : IHostedService, IAsyncDisposable
 {
-    private readonly MascotStateStore _store;
+    private readonly IMascotStateStore _store;
     private readonly DaprClient _daprClient;
     private readonly int _intervalSeconds;
     private readonly Func<string[], string> _zonePicker;
@@ -15,12 +15,12 @@ public sealed class MascotMovementService : IHostedService, IAsyncDisposable
     private Task? _timerTask;
     private CancellationTokenSource? _cts;
 
-    public MascotMovementService(MascotStateStore store, DaprClient daprClient, IConfiguration configuration)
+    public MascotMovementService(IMascotStateStore store, DaprClient daprClient, IConfiguration configuration)
         : this(store, daprClient, configuration, zones => zones[Random.Shared.Next(zones.Length)])
     {
     }
 
-    public MascotMovementService(MascotStateStore store, DaprClient daprClient, IConfiguration configuration,
+    public MascotMovementService(IMascotStateStore store, DaprClient daprClient, IConfiguration configuration,
         Func<string[], string> zonePicker)
     {
         _store = store;

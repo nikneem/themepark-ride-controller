@@ -1,12 +1,12 @@
 using Dapr.Client;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Api.Models;
-using ThemePark.Mascots.Api.State;
+using ThemePark.Mascots.State;
 using ThemePark.Mascots.Zones;
 
 namespace ThemePark.Mascots.Api.SimulateIntrusion;
 
-public sealed class SimulateIntrusionHandler(MascotStateStore store, DaprClient daprClient)
+public sealed class SimulateIntrusionHandler(IMascotStateStore store, DaprClient daprClient)
 {
     public async Task<IResult> HandleAsync(SimulateIntrusionRequest request, CancellationToken ct = default)
     {

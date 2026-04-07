@@ -1,8 +1,13 @@
 using Dapr.Client;
 using ThemePark.Maintenance.Models;
+using ThemePark.Maintenance.State;
 
-namespace ThemePark.Maintenance.Api.State;
+namespace ThemePark.Maintenance.Data.Dapr;
 
+/// <summary>
+/// Dapr state store implementation of <see cref="IMaintenanceStateStore"/>.
+/// Persists <see cref="MaintenanceRecord"/> objects and per-ride history lists.
+/// </summary>
 public sealed class DaprMaintenanceStateStore(DaprClient daprClient) : IMaintenanceStateStore
 {
     private const string StoreName = "statestore";

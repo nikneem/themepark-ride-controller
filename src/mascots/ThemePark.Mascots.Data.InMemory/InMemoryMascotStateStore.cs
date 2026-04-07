@@ -1,16 +1,21 @@
 using System.Collections.Concurrent;
 using ThemePark.Mascots.Models;
+using ThemePark.Mascots.State;
 using ThemePark.Mascots.Zones;
 
-namespace ThemePark.Mascots.Api.State;
+namespace ThemePark.Mascots.Data.InMemory;
 
 internal sealed record MascotState(string MascotId, string Name, string CurrentZone);
 
-public sealed class MascotStateStore
+/// <summary>
+/// In-memory implementation of <see cref="IMascotStateStore"/>.
+/// State resets on every restart by design — mascots are not persisted.
+/// </summary>
+public sealed class InMemoryMascotStateStore : IMascotStateStore
 {
     private readonly ConcurrentDictionary<string, MascotState> _mascots;
 
-    public MascotStateStore()
+    public InMemoryMascotStateStore()
     {
         _mascots = new ConcurrentDictionary<string, MascotState>(StringComparer.OrdinalIgnoreCase);
         foreach (var m in InitialMascots())
@@ -43,7 +48,7 @@ public sealed class MascotStateStore
         return true;
     }
 
-    /// <summary>Returns true if any mascot (including <paramref name="mascotId"/>) is in <paramref name="zone"/>.</summary>
+    /// <summary>Returns true if any mascot is in <paramref name="zone"/>.</summary>
     public bool IsZoneOccupied(string zone) =>
         _mascots.Values.Any(m => m.CurrentZone.Equals(zone, StringComparison.OrdinalIgnoreCase));
 

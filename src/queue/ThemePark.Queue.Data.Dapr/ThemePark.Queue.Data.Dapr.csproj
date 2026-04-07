@@ -1,20 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\Aspire\ThemePark.Aspire.ServiceDefaults\ThemePark.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\ThemePark.Queue\ThemePark.Queue.csproj" />
-    <ProjectReference Include="..\ThemePark.Queue.Data.Dapr\ThemePark.Queue.Data.Dapr.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
   </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
 </Project>

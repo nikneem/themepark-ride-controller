@@ -15,6 +15,7 @@
   <Folder Name="/src/maintenance/">
     <Project Path="src/maintenance/ThemePark.Maintenance.Abstractions/ThemePark.Maintenance.Abstractions.csproj" />
     <Project Path="src/maintenance/ThemePark.Maintenance.Api/ThemePark.Maintenance.Api.csproj" />
+    <Project Path="src/maintenance/ThemePark.Maintenance.Data.Dapr/ThemePark.Maintenance.Data.Dapr.csproj" />
     <Project Path="src/maintenance/ThemePark.Maintenance.Tests/ThemePark.Maintenance.Tests.csproj" />
     <Project Path="src/maintenance/ThemePark.Maintenance.Transactions/ThemePark.Maintenance.Transactions.csproj" />
     <Project Path="src/maintenance/ThemePark.Maintenance/ThemePark.Maintenance.csproj" />
@@ -22,6 +23,7 @@
   <Folder Name="/src/mascots/">
     <Project Path="src/mascots/ThemePark.Mascots.Abstractions/ThemePark.Mascots.Abstractions.csproj" />
     <Project Path="src/mascots/ThemePark.Mascots.Api/ThemePark.Mascots.Api.csproj" />
+    <Project Path="src/mascots/ThemePark.Mascots.Data.InMemory/ThemePark.Mascots.Data.InMemory.csproj" />
     <Project Path="src/mascots/ThemePark.Mascots.Tests/ThemePark.Mascots.Tests.csproj" />
     <Project Path="src/mascots/ThemePark.Mascots.Transactions/ThemePark.Mascots.Transactions.csproj" />
     <Project Path="src/mascots/ThemePark.Mascots/ThemePark.Mascots.csproj" />
@@ -29,6 +31,7 @@
   <Folder Name="/src/queue/">
     <Project Path="src/queue/ThemePark.Queue.Abstractions/ThemePark.Queue.Abstractions.csproj" />
     <Project Path="src/queue/ThemePark.Queue.Api/ThemePark.Queue.Api.csproj" />
+    <Project Path="src/queue/ThemePark.Queue.Data.Dapr/ThemePark.Queue.Data.Dapr.csproj" />
     <Project Path="src/queue/ThemePark.Queue.Tests/ThemePark.Queue.Tests.csproj" />
     <Project Path="src/queue/ThemePark.Queue.Transactions/ThemePark.Queue.Transactions.csproj" />
     <Project Path="src/queue/ThemePark.Queue/ThemePark.Queue.csproj" />
@@ -36,6 +39,7 @@
   <Folder Name="/src/refunds/">
     <Project Path="src/refunds/ThemePark.Refunds.Abstractions/ThemePark.Refunds.Abstractions.csproj" />
     <Project Path="src/refunds/ThemePark.Refunds.Api/ThemePark.Refunds.Api.csproj" />
+    <Project Path="src/refunds/ThemePark.Refunds.Data.Dapr/ThemePark.Refunds.Data.Dapr.csproj" />
     <Project Path="src/refunds/ThemePark.Refunds.Tests/ThemePark.Refunds.Tests.csproj" />
     <Project Path="src/refunds/ThemePark.Refunds.Transactions/ThemePark.Refunds.Transactions.csproj" />
     <Project Path="src/refunds/ThemePark.Refunds/ThemePark.Refunds.csproj" />
@@ -44,6 +48,7 @@
     <Project Path="src/rides/ThemePark.Rides.Abstractions/ThemePark.Rides.Abstractions.csproj" />
     <Project Path="src/rides/ThemePark.Rides.Api.Tests/ThemePark.Rides.Api.Tests.csproj" />
     <Project Path="src/rides/ThemePark.Rides.Api/ThemePark.Rides.Api.csproj" />
+    <Project Path="src/rides/ThemePark.Rides.Data.Dapr/ThemePark.Rides.Data.Dapr.csproj" />
     <Project Path="src/rides/ThemePark.Rides.Tests/ThemePark.Rides.Tests.csproj" />
     <Project Path="src/rides/ThemePark.Rides.Transactions/ThemePark.Rides.Transactions.csproj" />
     <Project Path="src/rides/ThemePark.Rides/ThemePark.Rides.csproj" />

@@ -1,20 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
-    <ProjectReference Include="..\..\Aspire\ThemePark.Aspire.ServiceDefaults\ThemePark.Aspire.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\..\Shared\ThemePark.EventContracts\ThemePark.EventContracts.csproj" />
     <ProjectReference Include="..\ThemePark.Refunds\ThemePark.Refunds.csproj" />
-    <ProjectReference Include="..\ThemePark.Refunds.Data.Dapr\ThemePark.Refunds.Data.Dapr.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
   </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
 </Project>

@@ -1,12 +1,12 @@
 using Dapr.Client;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Api.Models;
-using ThemePark.Mascots.Api.State;
+using ThemePark.Mascots.State;
 using ThemePark.Mascots.Zones;
 
 namespace ThemePark.Mascots.Api.ClearMascot;
 
-public sealed class ClearMascotHandler(MascotStateStore store, DaprClient daprClient)
+public sealed class ClearMascotHandler(IMascotStateStore store, DaprClient daprClient)
 {
     public async Task<IResult> HandleAsync(string mascotId, CancellationToken ct = default)
     {

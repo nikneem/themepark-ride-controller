@@ -1,16 +1,16 @@
-using Dapr.Client;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using ThemePark.Queue.Api.GetQueue;
 using ThemePark.Queue.Api.Models;
 using ThemePark.Queue.Models;
+using ThemePark.Queue.State;
 
 namespace ThemePark.Queue.Tests.GetQueue;
 
 public sealed class GetQueueHandlerTests
 {
-    private readonly Mock<DaprClient> _dapr = new();
+    private readonly Mock<IQueueStateStore> _store = new();
 
     private GetQueueHandler CreateHandler(double avgCapacity = 20, double avgDuration = 3)
     {
@@ -21,17 +21,14 @@ public sealed class GetQueueHandlerTests
                 ["Queue:AverageRideDurationMinutes"] = avgDuration.ToString()
             })
             .Build();
-        return new GetQueueHandler(_dapr.Object, config);
+        return new GetQueueHandler(_store.Object, config);
     }
 
     [Fact]
     public async Task HandleAsync_EmptyQueue_ReturnsZeros()
     {
-        _dapr.Setup(d => d.GetStateAsync<List<Passenger>?>(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<ConsistencyMode?>(), It.IsAny<IReadOnlyDictionary<string, string>?>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((List<Passenger>?)null);
+        _store.Setup(s => s.GetPassengersAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
 
         var result = await CreateHandler().HandleAsync("ride-1");
 
@@ -52,10 +49,7 @@ public sealed class GetQueueHandlerTests
             new(Guid.NewGuid(), "Dave", IsVip: false)
         };
 
-        _dapr.Setup(d => d.GetStateAsync<List<Passenger>?>(
-                It.IsAny<string>(), "queue-ride-42",
-                It.IsAny<ConsistencyMode?>(), It.IsAny<IReadOnlyDictionary<string, string>?>(),
-                It.IsAny<CancellationToken>()))
+        _store.Setup(s => s.GetPassengersAsync("ride-42", It.IsAny<CancellationToken>()))
             .ReturnsAsync(passengers);
 
         // estimatedWait = 4 / 20 * 3 = 0.6
@@ -76,10 +70,7 @@ public sealed class GetQueueHandlerTests
             new(Guid.NewGuid(), "Bob", IsVip: false)
         };
 
-        _dapr.Setup(d => d.GetStateAsync<List<Passenger>?>(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<ConsistencyMode?>(), It.IsAny<IReadOnlyDictionary<string, string>?>(),
-                It.IsAny<CancellationToken>()))
+        _store.Setup(s => s.GetPassengersAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(passengers);
 
         var result = await CreateHandler().HandleAsync("ride-1");

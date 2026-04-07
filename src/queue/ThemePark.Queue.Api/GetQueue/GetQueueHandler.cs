@@ -1,26 +1,22 @@
-using Dapr.Client;
-using ThemePark.Queue.Models;
 using ThemePark.Queue.Api.Models;
+using ThemePark.Queue.State;
 
 namespace ThemePark.Queue.Api.GetQueue;
 
 /// <summary>
 /// Returns the current queue state for a ride.
-/// Returns zeroed response when no queue exists (task 3.2).
+/// Returns zeroed response when no queue exists.
 /// </summary>
-public sealed class GetQueueHandler(DaprClient daprClient, IConfiguration configuration)
+public sealed class GetQueueHandler(IQueueStateStore stateStore, IConfiguration configuration)
 {
-    private const string StoreName = "themepark-statestore";
-
     public async Task<IResult> HandleAsync(string rideId, CancellationToken cancellationToken = default)
     {
         var avgLoadCapacity = configuration.GetValue<double>("Queue:AverageLoadCapacity", 20);
         var avgRideDuration = configuration.GetValue<double>("Queue:AverageRideDurationMinutes", 3);
 
-        var passengers = await daprClient.GetStateAsync<List<Passenger>?>(
-            StoreName, $"queue-{rideId}", cancellationToken: cancellationToken);
+        var passengers = await stateStore.GetPassengersAsync(rideId, cancellationToken);
 
-        if (passengers is null or { Count: 0 })
+        if (passengers.Count == 0)
         {
             return Results.Ok(new QueueStateResponse(rideId, 0, false, 0));
         }

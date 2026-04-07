@@ -1,6 +1,7 @@
 using ThemePark.Refunds.Api.GetRefundHistory;
 using ThemePark.Refunds.Api.IssueRefund;
-using ThemePark.Refunds.Api.State;
+using ThemePark.Refunds.Data.Dapr;
+using ThemePark.Refunds.State;
 
 var builder = WebApplication.CreateBuilder(args);
 

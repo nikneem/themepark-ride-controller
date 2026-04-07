@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using ThemePark.Maintenance.Api.GetMaintenanceHistory;
-using ThemePark.Maintenance.Api.State;
+using ThemePark.Maintenance.State;
 using ThemePark.Maintenance.Models;
 using ThemePark.Shared.Enums;
 

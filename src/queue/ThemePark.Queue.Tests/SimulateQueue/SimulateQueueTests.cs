@@ -1,4 +1,3 @@
-using Dapr.Client;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
@@ -7,29 +6,27 @@ using Moq;
 using ThemePark.Queue.Api.Models;
 using ThemePark.Queue.Api.SimulateQueue;
 using ThemePark.Queue.Models;
+using ThemePark.Queue.State;
 
 namespace ThemePark.Queue.Tests.SimulateQueue;
 
 public sealed class SimulateQueueHandlerTests
 {
-    private readonly Mock<DaprClient> _dapr = new();
+    private readonly Mock<IQueueStateStore> _store = new();
     private readonly SimulateQueueHandler _handler;
 
     public SimulateQueueHandlerTests()
     {
-        _handler = new SimulateQueueHandler(_dapr.Object);
+        _handler = new SimulateQueueHandler(_store.Object);
     }
 
     [Fact]
     public async Task HandleAsync_GeneratesCorrectPassengerCount()
     {
-        List<Passenger>? saved = null;
-        _dapr.Setup(d => d.SaveStateAsync(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<List<Passenger>>(), It.IsAny<StateOptions?>(),
-                It.IsAny<IReadOnlyDictionary<string, string>?>(), It.IsAny<CancellationToken>()))
-            .Callback<string, string, List<Passenger>, StateOptions?, IReadOnlyDictionary<string, string>?, CancellationToken>(
-                (_, _, passengers, _, _, _) => saved = passengers)
+        IReadOnlyList<Passenger>? saved = null;
+        _store.Setup(s => s.SavePassengersAsync(
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<Passenger>>(), It.IsAny<CancellationToken>()))
+            .Callback<string, IReadOnlyList<Passenger>, CancellationToken>((_, p, _) => saved = p)
             .Returns(Task.CompletedTask);
 
         await _handler.HandleAsync("ride-1", new SimulateQueueRequest(Count: 20, VipProbability: 0.2));
@@ -41,31 +38,24 @@ public sealed class SimulateQueueHandlerTests
     [Fact]
     public async Task HandleAsync_QueueReplacedNotAppended()
     {
-        _dapr.Setup(d => d.SaveStateAsync(
-                It.IsAny<string>(), "queue-ride-1",
-                It.IsAny<List<Passenger>>(), It.IsAny<StateOptions?>(),
-                It.IsAny<IReadOnlyDictionary<string, string>?>(), It.IsAny<CancellationToken>()))
+        _store.Setup(s => s.SavePassengersAsync(
+                "ride-1", It.IsAny<IReadOnlyList<Passenger>>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
         await _handler.HandleAsync("ride-1", new SimulateQueueRequest(Count: 10));
 
-        // SaveStateAsync called exactly once — replace, not append
-        _dapr.Verify(d => d.SaveStateAsync(
-            It.IsAny<string>(), "queue-ride-1",
-            It.IsAny<List<Passenger>>(), It.IsAny<StateOptions?>(),
-            It.IsAny<IReadOnlyDictionary<string, string>?>(), It.IsAny<CancellationToken>()), Times.Once);
+        // SavePassengersAsync called exactly once — replace, not append
+        _store.Verify(s => s.SavePassengersAsync(
+            "ride-1", It.IsAny<IReadOnlyList<Passenger>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task HandleAsync_AllPassengerIdsAreUnique()
     {
-        List<Passenger>? saved = null;
-        _dapr.Setup(d => d.SaveStateAsync(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<List<Passenger>>(), It.IsAny<StateOptions?>(),
-                It.IsAny<IReadOnlyDictionary<string, string>?>(), It.IsAny<CancellationToken>()))
-            .Callback<string, string, List<Passenger>, StateOptions?, IReadOnlyDictionary<string, string>?, CancellationToken>(
-                (_, _, passengers, _, _, _) => saved = passengers)
+        IReadOnlyList<Passenger>? saved = null;
+        _store.Setup(s => s.SavePassengersAsync(
+                It.IsAny<string>(), It.IsAny<IReadOnlyList<Passenger>>(), It.IsAny<CancellationToken>()))
+            .Callback<string, IReadOnlyList<Passenger>, CancellationToken>((_, p, _) => saved = p)
             .Returns(Task.CompletedTask);
 
         await _handler.HandleAsync("ride-1", new SimulateQueueRequest(Count: 100));

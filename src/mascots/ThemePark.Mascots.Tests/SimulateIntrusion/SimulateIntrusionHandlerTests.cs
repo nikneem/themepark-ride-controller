@@ -4,14 +4,14 @@ using Moq;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Api.Models;
 using ThemePark.Mascots.Api.SimulateIntrusion;
-using ThemePark.Mascots.Api.State;
+using ThemePark.Mascots.Data.InMemory;
 using ThemePark.Mascots.Zones;
 
 namespace ThemePark.Mascots.Tests.SimulateIntrusion;
 
 public class SimulateIntrusionHandlerTests
 {
-    private static (SimulateIntrusionHandler Handler, Mock<DaprClient> Dapr) CreateHandler(MascotStateStore store)
+    private static (SimulateIntrusionHandler Handler, Mock<DaprClient> Dapr) CreateHandler(InMemoryMascotStateStore store)
     {
         var daprMock = new Mock<DaprClient>();
         daprMock.Setup(d => d.PublishEventAsync(
@@ -25,7 +25,7 @@ public class SimulateIntrusionHandlerTests
     [Fact]
     public async Task HandleAsync_returns_202_on_success()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var (handler, _) = CreateHandler(store);
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-001", "ride-zone-a"));
@@ -36,7 +36,7 @@ public class SimulateIntrusionHandlerTests
     [Fact]
     public async Task HandleAsync_updates_mascot_zone_immediately()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var (handler, _) = CreateHandler(store);
 
         await handler.HandleAsync(new SimulateIntrusionRequest("mascot-002", "ride-zone-b"));
@@ -47,7 +47,7 @@ public class SimulateIntrusionHandlerTests
     [Fact]
     public async Task HandleAsync_publishes_mascot_in_restricted_zone_event()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var (handler, dapr) = CreateHandler(store);
 
         await handler.HandleAsync(new SimulateIntrusionRequest("mascot-003", "ride-zone-c"));
@@ -63,7 +63,7 @@ public class SimulateIntrusionHandlerTests
     [Fact]
     public async Task HandleAsync_returns_400_for_unknown_mascot()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var (handler, _) = CreateHandler(store);
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-999", "ride-zone-a"));
@@ -74,7 +74,7 @@ public class SimulateIntrusionHandlerTests
     [Fact]
     public async Task HandleAsync_returns_400_for_unknown_ride_zone()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var (handler, _) = CreateHandler(store);
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-001", "ride-zone-unknown"));
@@ -85,7 +85,7 @@ public class SimulateIntrusionHandlerTests
     [Fact]
     public async Task HandleAsync_returns_400_when_safe_zone_provided_as_target()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var (handler, _) = CreateHandler(store);
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-001", "Park-Central"));
@@ -96,7 +96,7 @@ public class SimulateIntrusionHandlerTests
     [Fact]
     public async Task HandleAsync_does_not_publish_if_zone_update_fails()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var daprMock = new Mock<DaprClient>();
         var handler = new SimulateIntrusionHandler(store, daprMock.Object);
 
@@ -111,3 +111,4 @@ public class SimulateIntrusionHandlerTests
             Times.Never);
     }
 }
+

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Api.Services;
-using ThemePark.Mascots.Api.State;
+using ThemePark.Mascots.Data.InMemory;
 using ThemePark.Mascots.Zones;
 
 namespace ThemePark.Mascots.Tests.Services;
@@ -19,7 +19,7 @@ public class MascotMovementServiceTests
             .Build();
 
     private static MascotMovementService CreateService(
-        MascotStateStore store,
+        InMemoryMascotStateStore store,
         Mock<DaprClient>? daprMock = null,
         Func<string[], string>? zonePicker = null)
     {
@@ -34,7 +34,7 @@ public class MascotMovementServiceTests
     [Fact]
     public async Task TickAsync_moves_mascots_to_specified_zones()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var zones = new[] { MascotZones.ZoneA, MascotZones.ZoneB, MascotZones.ZoneC };
         var index = 0;
         var service = CreateService(store, zonePicker: _ => zones[index++ % zones.Length]);
@@ -51,7 +51,7 @@ public class MascotMovementServiceTests
     [Fact]
     public async Task TickAsync_skips_mascot_when_target_zone_is_occupied()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         // Pre-populate: mascot-001 in Zone-A
         store.TryUpdateZone("mascot-001", MascotZones.ZoneA, out _);
         store.TryUpdateZone("mascot-002", MascotZones.ZoneB, out _);
@@ -73,7 +73,7 @@ public class MascotMovementServiceTests
     [Fact]
     public async Task TickAsync_publishes_event_only_for_restricted_zones()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var daprMock = new Mock<DaprClient>();
         daprMock.Setup(d => d.PublishEventAsync(
                 It.IsAny<string>(), It.IsAny<string>(),
@@ -102,7 +102,7 @@ public class MascotMovementServiceTests
     [Fact]
     public async Task TickAsync_does_not_publish_event_for_safe_zones()
     {
-        var store = new MascotStateStore();
+        var store = new InMemoryMascotStateStore();
         var daprMock = new Mock<DaprClient>();
 
         var service = CreateService(store, daprMock, _ => MascotZones.ParkCentral);

@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ThemePark.Rides\ThemePark.Rides.csproj" />
     <ProjectReference Include="..\ThemePark.Rides.Api\ThemePark.Rides.Api.csproj" />
+    <ProjectReference Include="..\ThemePark.Rides.Data.Dapr\ThemePark.Rides.Data.Dapr.csproj" />
   </ItemGroup>
 
 </Project>

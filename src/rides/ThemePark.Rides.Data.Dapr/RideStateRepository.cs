@@ -1,10 +1,9 @@
 using Dapr.Client;
-using ThemePark.Rides.Api._Shared;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
 using ThemePark.Shared.Enums;
 
-namespace ThemePark.Rides.Api.Infrastructure;
+namespace ThemePark.Rides.Data.Dapr;
 
 /// <summary>
 /// Persists ride status in the Dapr state store by reading and updating the full <see cref="RideState"/> object.
@@ -34,4 +33,3 @@ public sealed class RideStateRepository(DaprClient daprClient) : IRideStateRepos
             DaprRideStateStore.StoreName, Key(rideId), updated, cancellationToken: cancellationToken);
     }
 }
-

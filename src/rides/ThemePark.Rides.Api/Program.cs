@@ -1,13 +1,12 @@
-using ThemePark.Rides.Api._Shared;
 using ThemePark.Rides.Api.Features.Rides;
 using ThemePark.Rides.Api.GetRide;
-using ThemePark.Rides.Api.Infrastructure;
 using ThemePark.Rides.Api.PauseRide;
 using ThemePark.Rides.Api.ResumeRide;
 using ThemePark.Rides.Api.SimulateMalfunction;
 using ThemePark.Rides.Api.Startup;
 using ThemePark.Rides.Api.StartRide;
 using ThemePark.Rides.Api.StopRide;
+using ThemePark.Rides.Data.Dapr;
 using ThemePark.Rides.Exceptions;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared.Enums;
@@ -16,7 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
-builder.Services.AddScoped<ThemePark.Rides.Api._Shared.IRideStateStore, DaprRideStateStore>();
+// Old interface still used by vertical slice handlers (will migrate in Phase 4)
+builder.Services.AddScoped<ThemePark.Rides.Api._Shared.IRideStateStore, ThemePark.Rides.Api._Shared.DaprRideStateStore>();
+// New interfaces backed by the Data.Dapr project
+builder.Services.AddScoped<ThemePark.Rides.Infrastructure.IRideStateStore, DaprRideStateStore>();
 builder.Services.AddScoped<IRideStateRepository, RideStateRepository>();
 builder.Services.AddScoped<RideCommandHandlers>();
 builder.Services.AddHostedService<RideSeedService>();

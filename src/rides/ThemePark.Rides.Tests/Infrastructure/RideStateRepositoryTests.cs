@@ -1,7 +1,6 @@
 using Dapr.Client;
 using NSubstitute;
-using ThemePark.Rides.Api.Infrastructure;
-using ThemePark.Rides.Api._Shared;
+using ThemePark.Rides.Data.Dapr;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
 using ThemePark.Shared.Enums;

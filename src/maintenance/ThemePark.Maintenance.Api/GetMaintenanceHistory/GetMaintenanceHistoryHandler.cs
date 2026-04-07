@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using ThemePark.Maintenance.Api.State;
 using ThemePark.Maintenance.Models;
+using ThemePark.Maintenance.State;
 
 namespace ThemePark.Maintenance.Api.GetMaintenanceHistory;
 

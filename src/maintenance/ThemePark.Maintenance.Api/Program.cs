@@ -1,7 +1,8 @@
 using ThemePark.Maintenance.Api.CompleteMaintenanceRequest;
 using ThemePark.Maintenance.Api.CreateMaintenanceRequest;
 using ThemePark.Maintenance.Api.GetMaintenanceHistory;
-using ThemePark.Maintenance.Api.State;
+using ThemePark.Maintenance.Data.Dapr;
+using ThemePark.Maintenance.State;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using ThemePark.Refunds.Api.State;
 using ThemePark.Refunds.Models;
+using ThemePark.Refunds.State;
 
 namespace ThemePark.Refunds.Api.GetRefundHistory;
 

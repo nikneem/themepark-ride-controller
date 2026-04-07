@@ -2,8 +2,8 @@ using Dapr.Client;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Diagnostics;
 using ThemePark.EventContracts.Events;
-using ThemePark.Maintenance.Api.State;
 using ThemePark.Maintenance.Models;
+using ThemePark.Maintenance.State;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Maintenance.Api.CreateMaintenanceRequest;

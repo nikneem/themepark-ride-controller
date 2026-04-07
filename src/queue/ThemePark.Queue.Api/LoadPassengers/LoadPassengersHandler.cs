@@ -1,31 +1,27 @@
-using Dapr.Client;
-using ThemePark.Queue.Models;
 using ThemePark.Queue.Api.Models;
+using ThemePark.Queue.State;
 
 namespace ThemePark.Queue.Api.LoadPassengers;
 
 /// <summary>
 /// Atomically dequeues up to <c>capacity</c> passengers from a ride queue.
-/// Uses Dapr ETag concurrency with up to 5 retries (task 4.1).
+/// Uses ETag concurrency with up to 5 retries.
 /// </summary>
-public sealed class LoadPassengersHandler(DaprClient daprClient)
+public sealed class LoadPassengersHandler(IQueueStateStore stateStore)
 {
-    private const string StoreName = "themepark-statestore";
     private const int MaxRetries = 5;
 
     public async Task<IResult> HandleAsync(string rideId, LoadPassengersRequest request, CancellationToken cancellationToken = default)
     {
         for (var attempt = 0; attempt < MaxRetries; attempt++)
         {
-            var (passengers, etag) = await daprClient.GetStateAndETagAsync<List<Passenger>?>(
-                StoreName, $"queue-{rideId}", cancellationToken: cancellationToken);
+            var (passengers, etag) = await stateStore.GetPassengersWithETagAsync(rideId, cancellationToken);
 
-            var queue = passengers ?? [];
+            var queue = passengers.ToList();
             var toLoad = queue.Take(request.Capacity).ToList();
             var remainder = queue.Skip(request.Capacity).ToList();
 
-            var saved = await daprClient.TrySaveStateAsync(
-                StoreName, $"queue-{rideId}", remainder, etag, cancellationToken: cancellationToken);
+            var saved = await stateStore.TrySavePassengersAsync(rideId, remainder, etag, cancellationToken);
 
             if (!saved) continue;
 

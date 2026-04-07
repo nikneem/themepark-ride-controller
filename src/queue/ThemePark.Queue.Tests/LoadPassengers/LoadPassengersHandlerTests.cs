@@ -1,35 +1,29 @@
-using Dapr.Client;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using ThemePark.Queue.Api.LoadPassengers;
 using ThemePark.Queue.Api.Models;
 using ThemePark.Queue.Models;
+using ThemePark.Queue.State;
 
 namespace ThemePark.Queue.Tests.LoadPassengers;
 
 public sealed class LoadPassengersHandlerTests
 {
-    private readonly Mock<DaprClient> _dapr = new();
+    private readonly Mock<IQueueStateStore> _store = new();
     private readonly LoadPassengersHandler _handler;
 
     public LoadPassengersHandlerTests()
     {
-        _handler = new LoadPassengersHandler(_dapr.Object);
+        _handler = new LoadPassengersHandler(_store.Object);
     }
 
     private void SetupQueue(string rideId, List<Passenger> passengers, string etag = "\"1\"")
     {
-        _dapr.Setup(d => d.GetStateAndETagAsync<List<Passenger>?>(
-                It.IsAny<string>(), $"queue-{rideId}",
-                It.IsAny<ConsistencyMode?>(), It.IsAny<IReadOnlyDictionary<string, string>?>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync((passengers, etag));
+        _store.Setup(s => s.GetPassengersWithETagAsync(rideId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(((IReadOnlyList<Passenger>)passengers, etag));
 
-        _dapr.Setup(d => d.TrySaveStateAsync(
-                It.IsAny<string>(), $"queue-{rideId}",
-                It.IsAny<List<Passenger>>(), It.IsAny<string>(),
-                It.IsAny<StateOptions?>(), It.IsAny<IReadOnlyDictionary<string, string>?>(),
-                It.IsAny<CancellationToken>()))
+        _store.Setup(s => s.TrySavePassengersAsync(
+                rideId, It.IsAny<IReadOnlyList<Passenger>>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
     }
 

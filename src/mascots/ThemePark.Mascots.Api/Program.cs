@@ -2,7 +2,8 @@ using ThemePark.Mascots.Api.ClearMascot;
 using ThemePark.Mascots.Api.GetMascots;
 using ThemePark.Mascots.Api.Services;
 using ThemePark.Mascots.Api.SimulateIntrusion;
-using ThemePark.Mascots.Api.State;
+using ThemePark.Mascots.Data.InMemory;
+using ThemePark.Mascots.State;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,7 @@ builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
 
 // Singleton in-memory state store (no persistence — resets on restart by design)
-builder.Services.AddSingleton<MascotStateStore>();
+builder.Services.AddSingleton<IMascotStateStore, InMemoryMascotStateStore>();
 
 // Vertical slice handlers
 builder.Services.AddScoped<GetMascotsHandler>();

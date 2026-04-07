@@ -1,8 +1,13 @@
 using Dapr.Client;
 using ThemePark.Refunds.Models;
+using ThemePark.Refunds.State;
 
-namespace ThemePark.Refunds.Api.State;
+namespace ThemePark.Refunds.Data.Dapr;
 
+/// <summary>
+/// Dapr state store implementation of <see cref="IRefundStateStore"/>.
+/// Persists <see cref="RefundBatch"/> objects and per-ride refund history.
+/// </summary>
 public sealed class DaprRefundStateStore(DaprClient daprClient) : IRefundStateStore
 {
     private const string StoreName = "statestore";

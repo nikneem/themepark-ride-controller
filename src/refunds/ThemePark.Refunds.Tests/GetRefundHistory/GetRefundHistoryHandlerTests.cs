@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using ThemePark.Refunds.Api.GetRefundHistory;
-using ThemePark.Refunds.Api.State;
+using ThemePark.Refunds.State;
 using ThemePark.Refunds.Models;
 using ThemePark.Shared.Enums;
 
