@@ -1,0 +1,21 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\rides\ThemePark.Rides.Api\ThemePark.Rides.Api.csproj" />
+    <ProjectReference Include="..\..\queue\ThemePark.Queue.Api\ThemePark.Queue.Api.csproj" />
+    <ProjectReference Include="..\..\maintenance\ThemePark.Maintenance.Api\ThemePark.Maintenance.Api.csproj" />
+    <ProjectReference Include="..\..\weather\ThemePark.Weather.Api\ThemePark.Weather.Api.csproj" />
+    <ProjectReference Include="..\..\mascots\ThemePark.Mascots.Api\ThemePark.Mascots.Api.csproj" />
+    <ProjectReference Include="..\..\refunds\ThemePark.Refunds.Api\ThemePark.Refunds.Api.csproj" />
+    <ProjectReference Include="..\..\controlcenter\ThemePark.ControlCenter.Api\ThemePark.ControlCenter.Api.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>42fc391b-dbd3-4f4f-b6eb-527e97317820</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,6 @@
+@ThemePark.Mascots.Api_HostAddress = http://localhost:5231
+
+GET {{ThemePark.Mascots.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
