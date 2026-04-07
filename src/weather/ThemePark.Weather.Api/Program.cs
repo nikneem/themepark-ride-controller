@@ -1,5 +1,4 @@
 using Dapr.Client;
-using Microsoft.Extensions.Options;
 using ThemePark.Weather.Api.BackgroundServices;
 using ThemePark.Weather.Api.Configuration;
 using ThemePark.Weather.Api.GetCurrentWeather;
@@ -14,6 +13,7 @@ builder.Services.AddDaprClient();
 builder.Services.Configure<WeatherOptions>(
     builder.Configuration.GetSection(WeatherOptions.SectionName));
 builder.Services.AddSingleton<IWeatherSimulationEngine, WeatherSimulationEngine>();
+builder.Services.AddScoped<SimulateWeatherHandler>();
 builder.Services.AddHostedService<WeatherSimulationBackgroundService>();
 
 var app = builder.Build();

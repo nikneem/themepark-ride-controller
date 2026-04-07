@@ -24,9 +24,9 @@
 
 ## 5. Tests
 
-- [ ] 5.1 Unit test `WeatherSimulationEngine`: probability weights, Calm produces empty zones, Mild/Severe produce non-empty zones, initial state is Calm
-- [ ] 5.2 Unit test `WeatherSimulationBackgroundService`: Calm does not publish, Mild/Severe publish correct payload
-- [ ] 5.3 Unit test `POST /weather/simulate`: DemoMode off → 404, invalid severity → 400, Calm → 202 no publish, Mild/Severe → 202 + publish
+- [x] 5.1 Unit test `WeatherSimulationEngine`: probability weights, Calm produces empty zones, Mild/Severe produce non-empty zones, initial state is Calm
+- [x] 5.2 Unit test `WeatherSimulationBackgroundService`: Calm does not publish, Mild/Severe publish correct payload
+- [x] 5.3 Unit test `POST /weather/simulate`: DemoMode off → 404, invalid severity → 400, Calm → 202 no publish, Mild/Severe → 202 + publish
 
 ## 6. Documentation & Cleanup
 
