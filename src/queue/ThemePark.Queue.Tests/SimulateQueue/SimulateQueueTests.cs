@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using ThemePark.Queue.Api.Models;
+using ThemePark.Queue.Abstractions.DataTransferObjects;
 using ThemePark.Queue.Api.SimulateQueue;
+using ThemePark.Queue.Features.SimulateQueue;
 using ThemePark.Queue.Models;
 using ThemePark.Queue.State;
 

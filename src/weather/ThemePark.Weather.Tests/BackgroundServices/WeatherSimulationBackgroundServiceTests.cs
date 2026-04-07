@@ -5,7 +5,7 @@ using Moq;
 using ThemePark.EventContracts.Events;
 using ThemePark.Shared.Enums;
 using ThemePark.Weather.Api.BackgroundServices;
-using ThemePark.Weather.Api.Services;
+using ThemePark.Weather.Services;
 using ThemePark.Weather.Models;
 
 namespace ThemePark.Weather.Tests.BackgroundServices;

@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Rides.Api._Shared;
-using ThemePark.Rides.Api.StopRide;
+using ThemePark.Rides.Features.StopRide;
+using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Rides.Api.Tests.StopRide;
@@ -24,7 +23,7 @@ public sealed class StopRideHandlerTests
 
         var result = await _handler.HandleAsync(rideId.ToString());
 
-        Assert.IsType<Ok>(result);
+        Assert.True(result.IsSuccess);
         _store.Verify(s => s.SaveAsync(
             It.Is<RideState>(r => r.OperationalStatus == RideStatus.Idle),
             It.IsAny<CancellationToken>()), Times.Once);
@@ -39,8 +38,7 @@ public sealed class StopRideHandlerTests
 
         var result = await _handler.HandleAsync(rideId.ToString());
 
-        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
-        Assert.Equal(StatusCodes.Status409Conflict, statusResult.StatusCode);
+        Assert.Equal(OperationErrorKind.Conflict, result.ErrorKind);
         _store.Verify(s => s.SaveAsync(It.IsAny<RideState>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 }

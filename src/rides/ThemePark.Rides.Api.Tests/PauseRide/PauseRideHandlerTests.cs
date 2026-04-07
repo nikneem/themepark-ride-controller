@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Rides.Api._Shared;
-using ThemePark.Rides.Api.PauseRide;
+using ThemePark.Rides.Features.PauseRide;
+using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Rides.Api.Tests.PauseRide;
@@ -18,12 +17,9 @@ public sealed class PauseRideHandlerTests
     [Fact]
     public async Task HandleAsync_EmptyReason_Returns400()
     {
-        var request = new PauseRideRequest(Reason: "");
+        var result = await _handler.HandleAsync("any", new PauseRideCommand(Reason: ""));
 
-        var result = await _handler.HandleAsync("any", request);
-
-        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
-        Assert.Equal(StatusCodes.Status400BadRequest, statusResult.StatusCode);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
@@ -31,9 +27,9 @@ public sealed class PauseRideHandlerTests
     {
         _store.Setup(s => s.GetAsync("missing", It.IsAny<CancellationToken>())).ReturnsAsync((RideState?)null);
 
-        var result = await _handler.HandleAsync("missing", new PauseRideRequest("Safety check"));
+        var result = await _handler.HandleAsync("missing", new PauseRideCommand("Safety check"));
 
-        Assert.IsType<NotFound>(result);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 
     [Fact]
@@ -43,10 +39,9 @@ public sealed class PauseRideHandlerTests
         var state = new RideState(rideId, "Haunted Mansion", RideStatus.Idle, 16, 0, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString(), new PauseRideRequest("Emergency"));
+        var result = await _handler.HandleAsync(rideId.ToString(), new PauseRideCommand("Emergency"));
 
-        var statusResult = Assert.IsAssignableFrom<IStatusCodeHttpResult>(result);
-        Assert.Equal(StatusCodes.Status409Conflict, statusResult.StatusCode);
+        Assert.Equal(OperationErrorKind.Conflict, result.ErrorKind);
         _store.Verify(s => s.SaveAsync(It.IsAny<RideState>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
@@ -57,9 +52,9 @@ public sealed class PauseRideHandlerTests
         var state = new RideState(rideId, "Haunted Mansion", RideStatus.Running, 16, 8, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString(), new PauseRideRequest("Maintenance check"));
+        var result = await _handler.HandleAsync(rideId.ToString(), new PauseRideCommand("Maintenance check"));
 
-        Assert.IsType<Ok>(result);
+        Assert.True(result.IsSuccess);
         _store.Verify(s => s.SaveAsync(
             It.Is<RideState>(r => r.OperationalStatus == RideStatus.Paused && r.PauseReason == "Maintenance check"),
             It.IsAny<CancellationToken>()), Times.Once);

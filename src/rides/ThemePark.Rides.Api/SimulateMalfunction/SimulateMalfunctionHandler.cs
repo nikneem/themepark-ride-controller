@@ -1,6 +1,6 @@
 using Dapr.Client;
 using ThemePark.EventContracts.Events;
-using ThemePark.Rides.Api._Shared;
+using ThemePark.Rides.Infrastructure;
 
 namespace ThemePark.Rides.Api.SimulateMalfunction;
 
@@ -36,3 +36,4 @@ public sealed class SimulateMalfunctionHandler(IRideStateStore store, DaprClient
         return Results.Ok();
     }
 }
+

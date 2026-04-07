@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using ThemePark.EventContracts.Events;
-using ThemePark.Rides.Api._Shared;
+using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Api.SimulateMalfunction;
 using ThemePark.Rides.Models;
 using ThemePark.Shared.Enums;

@@ -1,9 +1,10 @@
-using Dapr.Client;
 using ThemePark.Weather.Api.BackgroundServices;
 using ThemePark.Weather.Api.Configuration;
 using ThemePark.Weather.Api.GetCurrentWeather;
 using ThemePark.Weather.Api.Services;
 using ThemePark.Weather.Api.SimulateWeather;
+using ThemePark.Weather.Features.SimulateWeather;
+using ThemePark.Weather.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,3 +26,4 @@ GetCurrentWeatherEndpoint.Map(app);
 SimulateWeatherEndpoint.Map(app);
 
 app.Run();
+

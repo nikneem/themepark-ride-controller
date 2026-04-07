@@ -1,6 +1,7 @@
-namespace ThemePark.Weather.Api.SimulateWeather;
+using ThemePark.Shared;
+using ThemePark.Weather.Features.SimulateWeather;
 
-public sealed record SimulateWeatherRequest(string Severity, string[] AffectedZones);
+namespace ThemePark.Weather.Api.SimulateWeather;
 
 public static class SimulateWeatherEndpoint
 {
@@ -10,11 +11,18 @@ public static class SimulateWeatherEndpoint
         if (!isDemoMode) return;
 
         app.MapPost("/weather/simulate", async (
-            SimulateWeatherRequest request,
+            SimulateWeatherCommand command,
             SimulateWeatherHandler handler,
-            CancellationToken ct) => await handler.HandleAsync(request, ct))
+            CancellationToken ct) =>
+        {
+            var result = await handler.HandleAsync(command, ct);
+            return result.IsSuccess
+                ? Results.Accepted()
+                : Results.BadRequest(new { error = result.Error });
+        })
         .WithName("SimulateWeather")
         .Produces(StatusCodes.Status202Accepted)
         .Produces(StatusCodes.Status400BadRequest);
     }
 }
+

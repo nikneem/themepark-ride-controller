@@ -1,3 +1,6 @@
+using ThemePark.Maintenance.Features.GetMaintenanceHistory;
+using ThemePark.Shared;
+
 namespace ThemePark.Maintenance.Api.GetMaintenanceHistory;
 
 public static class GetMaintenanceHistoryEndpoint
@@ -9,7 +12,10 @@ public static class GetMaintenanceHistoryEndpoint
             GetMaintenanceHistoryHandler handler,
             CancellationToken ct) =>
         {
-            return await handler.HandleAsync(rideId, ct);
+            var result = await handler.HandleAsync(rideId, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : Results.NotFound();
         })
         .WithName("GetMaintenanceHistory")
         .WithSummary("Get maintenance history for a ride")
@@ -18,3 +24,4 @@ public static class GetMaintenanceHistoryEndpoint
         return app;
     }
 }
+

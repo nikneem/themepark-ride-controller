@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Refunds.Api.IssueRefund;
-using ThemePark.Refunds.State;
+using ThemePark.Refunds.Abstractions.DataTransferObjects;
+using ThemePark.Refunds.Features.IssueRefund;
 using ThemePark.Refunds.Models;
+using ThemePark.Refunds.State;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Refunds.Tests.IssueRefund;
@@ -31,10 +32,10 @@ public sealed class IssueRefundHandlerTests
 
         var result = await CreateHandler().HandleAsync(request);
 
-        var ok = Assert.IsType<Ok<IssueRefundResponse>>(result.Result);
-        Assert.Equal(1, ok.Value!.TotalRefunded);
-        Assert.Equal(10.00m, ok.Value.TotalAmount);
-        Assert.Equal(0, ok.Value.VoucherCount);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1, result.Value!.TotalRefunded);
+        Assert.Equal(10.00m, result.Value.TotalAmount);
+        Assert.Equal(0, result.Value.VoucherCount);
     }
 
     [Fact]
@@ -47,10 +48,10 @@ public sealed class IssueRefundHandlerTests
 
         var result = await CreateHandler().HandleAsync(request);
 
-        var ok = Assert.IsType<Ok<IssueRefundResponse>>(result.Result);
-        Assert.Equal(1, ok.Value!.TotalRefunded);
-        Assert.Equal(10.00m, ok.Value.TotalAmount);
-        Assert.Equal(1, ok.Value.VoucherCount);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(1, result.Value!.TotalRefunded);
+        Assert.Equal(10.00m, result.Value.TotalAmount);
+        Assert.Equal(1, result.Value.VoucherCount);
     }
 
     [Fact]
@@ -67,10 +68,10 @@ public sealed class IssueRefundHandlerTests
 
         var result = await CreateHandler().HandleAsync(request);
 
-        var ok = Assert.IsType<Ok<IssueRefundResponse>>(result.Result);
-        Assert.Equal(3, ok.Value!.TotalRefunded);
-        Assert.Equal(30.00m, ok.Value.TotalAmount);
-        Assert.Equal(2, ok.Value.VoucherCount);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(3, result.Value!.TotalRefunded);
+        Assert.Equal(30.00m, result.Value.TotalAmount);
+        Assert.Equal(2, result.Value.VoucherCount);
     }
 
     [Fact]
@@ -89,9 +90,9 @@ public sealed class IssueRefundHandlerTests
 
         var result = await CreateHandler().HandleAsync(request);
 
-        var ok = Assert.IsType<Ok<IssueRefundResponse>>(result.Result);
-        Assert.Equal(existingSummary.RefundBatchId, ok.Value!.RefundBatchId);
-        Assert.Equal(WorkflowId, ok.Value.WorkflowId);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(existingSummary.RefundBatchId, result.Value!.RefundBatchId);
+        Assert.Equal(WorkflowId, result.Value.WorkflowId);
         // No new save should have occurred
         _store.Verify(s => s.SaveBatchAsync(It.IsAny<RefundBatch>(), It.IsAny<CancellationToken>()), Times.Never);
     }
@@ -135,7 +136,8 @@ public sealed class IssueRefundHandlerTests
 
         var result = await CreateHandler().HandleAsync(request);
 
-        Assert.IsType<BadRequest<string>>(result.Result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
@@ -147,6 +149,8 @@ public sealed class IssueRefundHandlerTests
 
         var result = await CreateHandler().HandleAsync(request);
 
-        Assert.IsType<BadRequest<string>>(result.Result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 }
+

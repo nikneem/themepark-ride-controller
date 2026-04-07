@@ -1,11 +1,11 @@
 using Dapr.Client;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using ThemePark.EventContracts.Events;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
-using ThemePark.Weather.Api.Services;
-using ThemePark.Weather.Api.SimulateWeather;
+using ThemePark.Weather.Features.SimulateWeather;
 using ThemePark.Weather.Models;
+using ThemePark.Weather.Services;
 
 namespace ThemePark.Weather.Tests.SimulateWeather;
 
@@ -29,39 +29,39 @@ public sealed class SimulateWeatherHandlerTests
     public async Task HandleAsync_Calm_returns_202()
     {
         var (handler, _, _) = CreateHandler();
-        var result = await handler.HandleAsync(new SimulateWeatherRequest("Calm", []));
-        Assert.IsType<Accepted>(result.Result);
+        var result = await handler.HandleAsync(new SimulateWeatherCommand("Calm", []));
+        Assert.True(result.IsSuccess);
     }
 
     [Fact]
     public async Task HandleAsync_Mild_returns_202()
     {
         var (handler, _, _) = CreateHandler();
-        var result = await handler.HandleAsync(new SimulateWeatherRequest("Mild", ["Zone-A"]));
-        Assert.IsType<Accepted>(result.Result);
+        var result = await handler.HandleAsync(new SimulateWeatherCommand("Mild", ["Zone-A"]));
+        Assert.True(result.IsSuccess);
     }
 
     [Fact]
     public async Task HandleAsync_Severe_returns_202()
     {
         var (handler, _, _) = CreateHandler();
-        var result = await handler.HandleAsync(new SimulateWeatherRequest("Severe", ["Zone-B"]));
-        Assert.IsType<Accepted>(result.Result);
+        var result = await handler.HandleAsync(new SimulateWeatherCommand("Severe", ["Zone-B"]));
+        Assert.True(result.IsSuccess);
     }
 
     [Fact]
     public async Task HandleAsync_invalid_severity_returns_400()
     {
         var (handler, _, _) = CreateHandler();
-        var result = await handler.HandleAsync(new SimulateWeatherRequest("Hurricane", []));
-        Assert.IsType<BadRequest<string>>(result.Result);
+        var result = await handler.HandleAsync(new SimulateWeatherCommand("Hurricane", []));
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
     public async Task HandleAsync_Calm_does_not_publish_event()
     {
         var (handler, _, dapr) = CreateHandler();
-        await handler.HandleAsync(new SimulateWeatherRequest("Calm", []));
+        await handler.HandleAsync(new SimulateWeatherCommand("Calm", []));
 
         dapr.Verify(d => d.PublishEventAsync(
             It.IsAny<string>(), It.IsAny<string>(),
@@ -73,7 +73,7 @@ public sealed class SimulateWeatherHandlerTests
     public async Task HandleAsync_Mild_publishes_weather_alert_event()
     {
         var (handler, _, dapr) = CreateHandler();
-        await handler.HandleAsync(new SimulateWeatherRequest("Mild", ["Zone-A", "Zone-B"]));
+        await handler.HandleAsync(new SimulateWeatherCommand("Mild", ["Zone-A", "Zone-B"]));
 
         dapr.Verify(d => d.PublishEventAsync(
             "themepark-pubsub", "weather.alert",
@@ -85,7 +85,7 @@ public sealed class SimulateWeatherHandlerTests
     public async Task HandleAsync_Severe_publishes_weather_alert_event()
     {
         var (handler, _, dapr) = CreateHandler();
-        await handler.HandleAsync(new SimulateWeatherRequest("Severe", ["Zone-C"]));
+        await handler.HandleAsync(new SimulateWeatherCommand("Severe", ["Zone-C"]));
 
         dapr.Verify(d => d.PublishEventAsync(
             "themepark-pubsub", "weather.alert",
@@ -97,7 +97,7 @@ public sealed class SimulateWeatherHandlerTests
     public async Task HandleAsync_forces_condition_on_engine()
     {
         var (handler, engine, _) = CreateHandler();
-        await handler.HandleAsync(new SimulateWeatherRequest("Severe", ["Zone-A"]));
+        await handler.HandleAsync(new SimulateWeatherCommand("Severe", ["Zone-A"]));
 
         engine.Verify(e => e.ForceCondition(
             It.Is<WeatherCondition>(c => c.Severity == WeatherSeverity.Severe)), Times.Once);

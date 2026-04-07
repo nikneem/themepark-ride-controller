@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Queue.Api.LoadPassengers;
-using ThemePark.Queue.Api.Models;
+using ThemePark.Queue.Abstractions.DataTransferObjects;
+using ThemePark.Queue.Features.LoadPassengers;
 using ThemePark.Queue.Models;
 using ThemePark.Queue.State;
+using ThemePark.Shared;
 
 namespace ThemePark.Queue.Tests.LoadPassengers;
 
@@ -37,10 +37,10 @@ public sealed class LoadPassengersHandlerTests
 
         var result = await _handler.HandleAsync("ride-1", new LoadPassengersRequest(4));
 
-        var ok = Assert.IsType<Ok<LoadPassengersResponse>>(result);
-        Assert.Equal(4, ok.Value!.LoadedCount);
-        Assert.Equal(2, ok.Value.RemainingInQueue);
-        Assert.Equal(4, ok.Value.Passengers.Count);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(4, result.Value!.LoadedCount);
+        Assert.Equal(2, result.Value.RemainingInQueue);
+        Assert.Equal(4, result.Value.Passengers.Count);
     }
 
     [Fact]
@@ -53,9 +53,9 @@ public sealed class LoadPassengersHandlerTests
 
         var result = await _handler.HandleAsync("ride-2", new LoadPassengersRequest(10));
 
-        var ok = Assert.IsType<Ok<LoadPassengersResponse>>(result);
-        Assert.Equal(3, ok.Value!.LoadedCount);
-        Assert.Equal(0, ok.Value.RemainingInQueue);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(3, result.Value!.LoadedCount);
+        Assert.Equal(0, result.Value.RemainingInQueue);
     }
 
     [Fact]
@@ -65,10 +65,10 @@ public sealed class LoadPassengersHandlerTests
 
         var result = await _handler.HandleAsync("ride-3", new LoadPassengersRequest(4));
 
-        var ok = Assert.IsType<Ok<LoadPassengersResponse>>(result);
-        Assert.Equal(0, ok.Value!.LoadedCount);
-        Assert.Equal(0, ok.Value.VipCount);
-        Assert.Empty(ok.Value.Passengers);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(0, result.Value!.LoadedCount);
+        Assert.Equal(0, result.Value.VipCount);
+        Assert.Empty(result.Value.Passengers);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public sealed class LoadPassengersHandlerTests
 
         var result = await _handler.HandleAsync("ride-4", new LoadPassengersRequest(4));
 
-        var ok = Assert.IsType<Ok<LoadPassengersResponse>>(result);
-        Assert.Equal(2, ok.Value!.VipCount);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(2, result.Value!.VipCount);
     }
 }

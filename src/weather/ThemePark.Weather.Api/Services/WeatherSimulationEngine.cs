@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using ThemePark.Shared.Enums;
 using ThemePark.Weather.Api.Configuration;
 using ThemePark.Weather.Models;
+using ThemePark.Weather.Services;
 
 namespace ThemePark.Weather.Api.Services;
 

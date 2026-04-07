@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Refunds.Api.GetRefundHistory;
-using ThemePark.Refunds.State;
+using ThemePark.Refunds.Abstractions.DataTransferObjects;
+using ThemePark.Refunds.Features.GetRefundHistory;
 using ThemePark.Refunds.Models;
+using ThemePark.Refunds.State;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Refunds.Tests.GetRefundHistory;
@@ -22,9 +22,9 @@ public sealed class GetRefundHistoryHandlerTests
 
         var result = await CreateHandler().HandleAsync(_rideId);
 
-        var ok = Assert.IsType<Ok<GetRefundHistoryResponse>>(result);
-        Assert.Equal(_rideId, ok.Value!.RideId);
-        Assert.Empty(ok.Value.History);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(_rideId, result.Value!.RideId);
+        Assert.Empty(result.Value.History);
     }
 
     [Fact]
@@ -41,10 +41,11 @@ public sealed class GetRefundHistoryHandlerTests
 
         var result = await CreateHandler().HandleAsync(_rideId);
 
-        var ok = Assert.IsType<Ok<GetRefundHistoryResponse>>(result);
-        Assert.Equal(_rideId, ok.Value!.RideId);
-        Assert.Equal(2, ok.Value.History.Count);
-        Assert.Equal("wf-001", ok.Value.History[0].WorkflowId);
-        Assert.Equal("wf-002", ok.Value.History[1].WorkflowId);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(_rideId, result.Value!.RideId);
+        Assert.Equal(2, result.Value.History.Count);
+        Assert.Equal("wf-001", result.Value.History[0].WorkflowId);
+        Assert.Equal("wf-002", result.Value.History[1].WorkflowId);
     }
 }
+

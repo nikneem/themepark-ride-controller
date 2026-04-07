@@ -1,9 +1,10 @@
 using Dapr.Client;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Maintenance.Api.CreateMaintenanceRequest;
-using ThemePark.Maintenance.State;
+using ThemePark.Maintenance.Abstractions.DataTransferObjects;
+using ThemePark.Maintenance.Features.CreateMaintenanceRequest;
 using ThemePark.Maintenance.Models;
+using ThemePark.Maintenance.State;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Maintenance.Tests.CreateMaintenanceRequest;
@@ -24,10 +25,10 @@ public sealed class CreateMaintenanceRequestHandlerTests
 
         var result = await CreateSut().HandleAsync(command);
 
-        var created = Assert.IsType<Created<CreateMaintenanceRequestResponse>>(result.Result);
-        Assert.Equal(command.RideId, created.Value!.RideId);
-        Assert.Equal("Pending", created.Value.Status);
-        Assert.NotEqual(Guid.Empty, created.Value.MaintenanceId);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(command.RideId, result.Value!.RideId);
+        Assert.Equal("Pending", result.Value.Status);
+        Assert.NotEqual(Guid.Empty, result.Value.MaintenanceId);
     }
 
     [Fact]
@@ -37,7 +38,8 @@ public sealed class CreateMaintenanceRequestHandlerTests
 
         var result = await CreateSut().HandleAsync(command);
 
-        Assert.IsType<BadRequest<string>>(result.Result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
@@ -47,7 +49,8 @@ public sealed class CreateMaintenanceRequestHandlerTests
 
         var result = await CreateSut().HandleAsync(command);
 
-        Assert.IsType<BadRequest<string>>(result.Result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
@@ -90,3 +93,4 @@ public sealed class CreateMaintenanceRequestHandlerTests
         Assert.True(saved!.RequestedAt >= before);
     }
 }
+

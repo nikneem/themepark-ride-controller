@@ -1,12 +1,11 @@
 using Dapr.Client;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using ThemePark.EventContracts.Events;
-using ThemePark.Mascots.Api.ClearMascot;
-using ThemePark.Mascots.Api.Models;
+using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.Data.InMemory;
+using ThemePark.Mascots.Features.ClearMascot;
 using ThemePark.Mascots.Zones;
+using ThemePark.Shared;
 
 namespace ThemePark.Mascots.Tests.ClearMascot;
 
@@ -32,9 +31,9 @@ public class ClearMascotHandlerTests
 
         var result = await handler.HandleAsync("mascot-001");
 
-        var ok = Assert.IsType<Ok<ClearMascotResponse>>(result);
-        Assert.Equal("mascot-001", ok.Value!.MascotId);
-        Assert.Equal(MascotZones.RideAId, ok.Value.ClearedFromRideId);
+        Assert.True(result.IsSuccess);
+        Assert.Equal("mascot-001", result.Value!.MascotId);
+        Assert.Equal(MascotZones.RideAId, result.Value.ClearedFromRideId);
     }
 
     [Fact]
@@ -74,19 +73,20 @@ public class ClearMascotHandlerTests
 
         var result = await handler.HandleAsync("unknown-999");
 
-        Assert.IsType<NotFound>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 
     [Fact]
     public async Task HandleAsync_returns_404_when_mascot_not_in_restricted_zone()
     {
         var store = new InMemoryMascotStateStore();
-        // mascot-001 is in Park-Central (safe) by default
         var (handler, _) = CreateHandler(store);
 
         var result = await handler.HandleAsync("mascot-001");
 
-        Assert.IsType<NotFound>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 
     [Fact]
@@ -98,7 +98,9 @@ public class ClearMascotHandlerTests
 
         var result = await handler.HandleAsync("mascot-002");
 
-        Assert.IsType<NotFound>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 }
+
 

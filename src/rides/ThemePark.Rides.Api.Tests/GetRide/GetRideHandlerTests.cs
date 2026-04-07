@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Rides.Api._Shared;
-using ThemePark.Rides.Api.GetRide;
+using ThemePark.Rides.Features.GetRide;
+using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Rides.Api.Tests.GetRide;
@@ -24,10 +24,10 @@ public sealed class GetRideHandlerTests
 
         var result = await _handler.HandleAsync(rideId.ToString());
 
-        var ok = Assert.IsType<Ok<RideStateResponse>>(result);
-        Assert.Equal(rideId, ok.Value!.RideId);
-        Assert.Equal("Thunder Mountain", ok.Value.Name);
-        Assert.Equal("Running", ok.Value.OperationalStatus);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(rideId, result.Value!.RideId);
+        Assert.Equal("Thunder Mountain", result.Value.Name);
+        Assert.Equal("Running", result.Value.OperationalStatus);
     }
 
     [Fact]
@@ -38,6 +38,7 @@ public sealed class GetRideHandlerTests
 
         var result = await _handler.HandleAsync("unknown");
 
-        Assert.IsType<NotFound>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 }

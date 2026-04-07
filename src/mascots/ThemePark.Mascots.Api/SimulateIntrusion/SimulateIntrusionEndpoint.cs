@@ -1,4 +1,6 @@
-using ThemePark.Mascots.Api.Models;
+using ThemePark.Mascots.Abstractions.DataTransferObjects;
+using ThemePark.Mascots.Features.SimulateIntrusion;
+using ThemePark.Shared;
 
 namespace ThemePark.Mascots.Api.SimulateIntrusion;
 
@@ -10,9 +12,15 @@ public static class SimulateIntrusionEndpoint
             return app;
 
         app.MapPost("/mascots/simulate-intrusion",
-            (SimulateIntrusionRequest request, SimulateIntrusionHandler handler, CancellationToken ct) =>
-                handler.HandleAsync(request, ct));
+            async (SimulateIntrusionRequest request, SimulateIntrusionHandler handler, CancellationToken ct) =>
+            {
+                var result = await handler.HandleAsync(request, ct);
+                return result.IsSuccess
+                    ? Results.Accepted()
+                    : Results.BadRequest(new { error = result.Error });
+            });
 
         return app;
     }
 }
+

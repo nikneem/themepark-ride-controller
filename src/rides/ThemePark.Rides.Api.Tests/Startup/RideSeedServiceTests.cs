@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using ThemePark.Rides.Api._Shared;
+using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Api.Startup;
 using ThemePark.Rides.Models;
 using ThemePark.Shared.Catalog;

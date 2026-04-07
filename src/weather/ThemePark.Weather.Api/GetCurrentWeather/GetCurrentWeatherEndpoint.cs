@@ -1,4 +1,4 @@
-using ThemePark.Weather.Api.Services;
+using ThemePark.Weather.Services;
 using ThemePark.Weather.Models;
 
 namespace ThemePark.Weather.Api.GetCurrentWeather;

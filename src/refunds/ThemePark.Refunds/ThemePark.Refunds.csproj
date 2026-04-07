@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ThemePark.Shared\ThemePark.Shared.csproj" />
+    <ProjectReference Include="..\ThemePark.Refunds.Abstractions\ThemePark.Refunds.Abstractions.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

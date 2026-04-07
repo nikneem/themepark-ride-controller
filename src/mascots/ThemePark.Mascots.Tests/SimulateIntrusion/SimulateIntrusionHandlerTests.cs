@@ -1,11 +1,11 @@
 using Dapr.Client;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using ThemePark.EventContracts.Events;
-using ThemePark.Mascots.Api.Models;
-using ThemePark.Mascots.Api.SimulateIntrusion;
+using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.Data.InMemory;
+using ThemePark.Mascots.Features.SimulateIntrusion;
 using ThemePark.Mascots.Zones;
+using ThemePark.Shared;
 
 namespace ThemePark.Mascots.Tests.SimulateIntrusion;
 
@@ -30,7 +30,7 @@ public class SimulateIntrusionHandlerTests
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-001", "ride-zone-a"));
 
-        Assert.IsType<Accepted>(result);
+        Assert.True(result.IsSuccess);
     }
 
     [Fact]
@@ -68,7 +68,8 @@ public class SimulateIntrusionHandlerTests
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-999", "ride-zone-a"));
 
-        Assert.IsType<BadRequest<string>>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
@@ -79,7 +80,8 @@ public class SimulateIntrusionHandlerTests
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-001", "ride-zone-unknown"));
 
-        Assert.IsType<BadRequest<string>>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
@@ -90,7 +92,8 @@ public class SimulateIntrusionHandlerTests
 
         var result = await handler.HandleAsync(new SimulateIntrusionRequest("mascot-001", "Park-Central"));
 
-        Assert.IsType<BadRequest<string>>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
 
     [Fact]
@@ -111,4 +114,5 @@ public class SimulateIntrusionHandlerTests
             Times.Never);
     }
 }
+
 

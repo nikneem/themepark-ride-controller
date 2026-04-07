@@ -2,6 +2,9 @@ using ThemePark.Maintenance.Api.CompleteMaintenanceRequest;
 using ThemePark.Maintenance.Api.CreateMaintenanceRequest;
 using ThemePark.Maintenance.Api.GetMaintenanceHistory;
 using ThemePark.Maintenance.Data.Dapr;
+using ThemePark.Maintenance.Features.CompleteMaintenanceRequest;
+using ThemePark.Maintenance.Features.CreateMaintenanceRequest;
+using ThemePark.Maintenance.Features.GetMaintenanceHistory;
 using ThemePark.Maintenance.State;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,4 +26,5 @@ app.MapCompleteMaintenanceRequest();
 app.MapGetMaintenanceHistory();
 
 app.Run();
+
 

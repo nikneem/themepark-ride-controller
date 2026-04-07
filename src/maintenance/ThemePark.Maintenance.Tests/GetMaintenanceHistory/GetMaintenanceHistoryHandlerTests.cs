@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using ThemePark.Maintenance.Api.GetMaintenanceHistory;
-using ThemePark.Maintenance.State;
+using ThemePark.Maintenance.Abstractions.DataTransferObjects;
+using ThemePark.Maintenance.Features.GetMaintenanceHistory;
 using ThemePark.Maintenance.Models;
+using ThemePark.Maintenance.State;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Maintenance.Tests.GetMaintenanceHistory;
@@ -26,7 +27,8 @@ public sealed class GetMaintenanceHistoryHandlerTests
 
         var result = await CreateSut().HandleAsync(Guid.NewGuid());
 
-        Assert.IsType<NotFound>(result.Result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 
     [Fact]
@@ -41,10 +43,10 @@ public sealed class GetMaintenanceHistoryHandlerTests
 
         var result = await CreateSut().HandleAsync(rideId);
 
-        var ok = Assert.IsType<Ok<GetMaintenanceHistoryResponse>>(result.Result);
-        Assert.Equal(rideId, ok.Value!.RideId);
-        Assert.Single(ok.Value.History);
-        Assert.Equal(record.MaintenanceId, ok.Value.History[0].MaintenanceId);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(rideId, result.Value!.RideId);
+        Assert.Single(result.Value.History);
+        Assert.Equal(record.MaintenanceId, result.Value.History[0].MaintenanceId);
     }
 
     [Fact]
@@ -63,7 +65,8 @@ public sealed class GetMaintenanceHistoryHandlerTests
 
         var result = await CreateSut().HandleAsync(rideId);
 
-        var ok = Assert.IsType<Ok<GetMaintenanceHistoryResponse>>(result.Result);
-        Assert.Single(ok.Value!.History);
+        Assert.True(result.IsSuccess);
+        Assert.Single(result.Value!.History);
     }
 }
+

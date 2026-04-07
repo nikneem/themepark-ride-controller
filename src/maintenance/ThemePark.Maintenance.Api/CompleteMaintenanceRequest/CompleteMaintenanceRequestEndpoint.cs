@@ -1,3 +1,7 @@
+using ThemePark.Maintenance.Abstractions.DataTransferObjects;
+using ThemePark.Maintenance.Features.CompleteMaintenanceRequest;
+using ThemePark.Shared;
+
 namespace ThemePark.Maintenance.Api.CompleteMaintenanceRequest;
 
 public static class CompleteMaintenanceRequestEndpoint
@@ -9,7 +13,12 @@ public static class CompleteMaintenanceRequestEndpoint
             CompleteMaintenanceRequestHandler handler,
             CancellationToken ct) =>
         {
-            return await handler.HandleAsync(new CompleteMaintenanceRequestCommand(maintenanceId), ct);
+            var result = await handler.HandleAsync(new CompleteMaintenanceRequestCommand(maintenanceId), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : result.ErrorKind == OperationErrorKind.NotFound
+                    ? Results.NotFound()
+                    : Results.Conflict(new { error = result.Error });
         })
         .WithName("CompleteMaintenanceRequest")
         .WithSummary("Mark a maintenance request as completed")
@@ -18,3 +27,4 @@ public static class CompleteMaintenanceRequestEndpoint
         return app;
     }
 }
+

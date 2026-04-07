@@ -1,3 +1,6 @@
+using ThemePark.Refunds.Abstractions.DataTransferObjects;
+using ThemePark.Refunds.Features.GetRefundHistory;
+
 namespace ThemePark.Refunds.Api.GetRefundHistory;
 
 public static class GetRefundHistoryEndpoint
@@ -9,7 +12,8 @@ public static class GetRefundHistoryEndpoint
             GetRefundHistoryHandler handler,
             CancellationToken ct) =>
         {
-            return await handler.HandleAsync(rideId, ct);
+            var result = await handler.HandleAsync(rideId, ct);
+            return Results.Ok(result.Value);
         })
         .WithName("GetRefundHistory")
         .WithSummary("Get refund history for a ride (last 20 batches)")
@@ -18,3 +22,4 @@ public static class GetRefundHistoryEndpoint
         return app;
     }
 }
+

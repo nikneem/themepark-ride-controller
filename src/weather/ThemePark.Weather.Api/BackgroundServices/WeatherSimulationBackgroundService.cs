@@ -2,7 +2,7 @@ using Dapr.Client;
 using ThemePark.EventContracts.Events;
 using ThemePark.Shared.Enums;
 using ThemePark.Weather.Api.Configuration;
-using ThemePark.Weather.Api.Services;
+using ThemePark.Weather.Services;
 
 namespace ThemePark.Weather.Api.BackgroundServices;
 

@@ -2,6 +2,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ThemePark.Shared\ThemePark.Shared.csproj" />
+    <ProjectReference Include="..\ThemePark.Maintenance.Abstractions\ThemePark.Maintenance.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Shared\ThemePark.EventContracts\ThemePark.EventContracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />
   </ItemGroup>
 
   <PropertyGroup>

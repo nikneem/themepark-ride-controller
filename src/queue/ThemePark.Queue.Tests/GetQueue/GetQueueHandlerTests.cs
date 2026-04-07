@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using ThemePark.Queue.Api.GetQueue;
-using ThemePark.Queue.Api.Models;
+using ThemePark.Queue.Abstractions.DataTransferObjects;
+using ThemePark.Queue.Features.GetQueue;
 using ThemePark.Queue.Models;
 using ThemePark.Queue.State;
+using ThemePark.Shared;
 
 namespace ThemePark.Queue.Tests.GetQueue;
 
@@ -32,10 +32,10 @@ public sealed class GetQueueHandlerTests
 
         var result = await CreateHandler().HandleAsync("ride-1");
 
-        var ok = Assert.IsType<Ok<QueueStateResponse>>(result);
-        Assert.Equal(0, ok.Value!.WaitingCount);
-        Assert.False(ok.Value.HasVip);
-        Assert.Equal(0, ok.Value.EstimatedWaitMinutes);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(0, result.Value!.WaitingCount);
+        Assert.False(result.Value.HasVip);
+        Assert.Equal(0, result.Value.EstimatedWaitMinutes);
     }
 
     [Fact]
@@ -55,10 +55,10 @@ public sealed class GetQueueHandlerTests
         // estimatedWait = 4 / 20 * 3 = 0.6
         var result = await CreateHandler(avgCapacity: 20, avgDuration: 3).HandleAsync("ride-42");
 
-        var ok = Assert.IsType<Ok<QueueStateResponse>>(result);
-        Assert.Equal(4, ok.Value!.WaitingCount);
-        Assert.True(ok.Value.HasVip);
-        Assert.Equal(0.6, ok.Value.EstimatedWaitMinutes);
+        Assert.True(result.IsSuccess);
+        Assert.Equal(4, result.Value!.WaitingCount);
+        Assert.True(result.Value.HasVip);
+        Assert.Equal(0.6, result.Value.EstimatedWaitMinutes);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class GetQueueHandlerTests
 
         var result = await CreateHandler().HandleAsync("ride-1");
 
-        var ok = Assert.IsType<Ok<QueueStateResponse>>(result);
-        Assert.False(ok.Value!.HasVip);
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Value!.HasVip);
     }
 }

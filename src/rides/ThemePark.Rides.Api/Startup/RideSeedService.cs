@@ -1,4 +1,4 @@
-using ThemePark.Rides.Api._Shared;
+using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
 using ThemePark.Shared.Catalog;
 using ThemePark.Shared.Enums;
