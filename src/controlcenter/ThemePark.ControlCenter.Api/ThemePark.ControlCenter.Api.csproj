@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Aspire\ThemePark.Aspire.ServiceDefaults\ThemePark.Aspire.ServiceDefaults.csproj" />
     <ProjectReference Include="..\..\Shared\ThemePark.EventContracts\ThemePark.EventContracts.csproj" />
+    <ProjectReference Include="..\ThemePark.ControlCenter\ThemePark.ControlCenter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
