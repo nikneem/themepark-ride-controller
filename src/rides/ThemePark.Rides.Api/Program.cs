@@ -1,7 +1,13 @@
 using ThemePark.Rides.Api._Shared;
 using ThemePark.Rides.Api.Features.Rides;
+using ThemePark.Rides.Api.GetRide;
 using ThemePark.Rides.Api.Infrastructure;
+using ThemePark.Rides.Api.PauseRide;
+using ThemePark.Rides.Api.ResumeRide;
+using ThemePark.Rides.Api.SimulateMalfunction;
 using ThemePark.Rides.Api.Startup;
+using ThemePark.Rides.Api.StartRide;
+using ThemePark.Rides.Api.StopRide;
 using ThemePark.Rides.Exceptions;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared.Enums;
@@ -15,19 +21,34 @@ builder.Services.AddScoped<IRideStateRepository, RideStateRepository>();
 builder.Services.AddScoped<RideCommandHandlers>();
 builder.Services.AddHostedService<RideSeedService>();
 
+// Vertical slice handlers
+builder.Services.AddScoped<GetRideHandler>();
+builder.Services.AddScoped<StartRideHandler>();
+builder.Services.AddScoped<PauseRideHandler>();
+builder.Services.AddScoped<ResumeRideHandler>();
+builder.Services.AddScoped<StopRideHandler>();
+builder.Services.AddScoped<SimulateMalfunctionHandler>();
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
 app.UseHttpsRedirection();
 
-// GET /api/rides/{rideId}/status — returns current ride status from Dapr state store
+// Vertical slice endpoints
+app.MapGetRide();
+app.MapStartRide();
+app.MapPauseRide();
+app.MapResumeRide();
+app.MapStopRide();
+app.MapSimulateMalfunction();
+
+// Legacy endpoints (kept for backward compatibility with workflow activities)
 app.MapGet("/api/rides/{rideId}/status", async (string rideId, IRideStateRepository repo, CancellationToken ct) =>
 {
     var status = await repo.GetStatusAsync(rideId, ct);
     return Results.Ok(new { rideId, status = status.ToString() });
 });
 
-// GET /api/rides — returns all catalog rides with their current status
 app.MapGet("/api/rides", async (IRideStateRepository repo, CancellationToken ct) =>
 {
     var rides = ThemePark.Shared.Catalog.RideCatalog.All;
@@ -39,7 +60,6 @@ app.MapGet("/api/rides", async (IRideStateRepository repo, CancellationToken ct)
     return Results.Ok(results);
 });
 
-// POST /api/rides/{rideId}/transition — manually trigger a state transition
 app.MapPost("/api/rides/{rideId}/transition", async (
     string rideId,
     TransitionRequest request,

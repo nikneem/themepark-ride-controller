@@ -6,6 +6,7 @@ namespace ThemePark.EventContracts.Events;
 public sealed record RideMalfunctionEvent(
     Guid EventId,
     Guid RideId,
+    string RideName,
     string FaultCode,
     string Description,
     DateTimeOffset OccurredAt);
