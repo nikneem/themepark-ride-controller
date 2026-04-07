@@ -1,10 +1,8 @@
+using ThemePark.Maintenance;
 using ThemePark.Maintenance.Api.CompleteMaintenanceRequest;
 using ThemePark.Maintenance.Api.CreateMaintenanceRequest;
 using ThemePark.Maintenance.Api.GetMaintenanceHistory;
 using ThemePark.Maintenance.Data.Dapr;
-using ThemePark.Maintenance.Features.CompleteMaintenanceRequest;
-using ThemePark.Maintenance.Features.CreateMaintenanceRequest;
-using ThemePark.Maintenance.Features.GetMaintenanceHistory;
 using ThemePark.Maintenance.State;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,9 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
 builder.Services.AddSingleton<IMaintenanceStateStore, DaprMaintenanceStateStore>();
-builder.Services.AddScoped<CreateMaintenanceRequestHandler>();
-builder.Services.AddScoped<CompleteMaintenanceRequestHandler>();
-builder.Services.AddScoped<GetMaintenanceHistoryHandler>();
+builder.Services.AddMaintenanceModule();
 
 var app = builder.Build();
 

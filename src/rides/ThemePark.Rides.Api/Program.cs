@@ -1,3 +1,4 @@
+using ThemePark.Rides;
 using ThemePark.Rides.Api.Features.Rides;
 using ThemePark.Rides.Api.GetRide;
 using ThemePark.Rides.Api.PauseRide;
@@ -8,11 +9,6 @@ using ThemePark.Rides.Api.StartRide;
 using ThemePark.Rides.Api.StopRide;
 using ThemePark.Rides.Data.Dapr;
 using ThemePark.Rides.Exceptions;
-using ThemePark.Rides.Features.GetRide;
-using ThemePark.Rides.Features.PauseRide;
-using ThemePark.Rides.Features.ResumeRide;
-using ThemePark.Rides.Features.StartRide;
-using ThemePark.Rides.Features.StopRide;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared.Enums;
 
@@ -20,18 +16,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
-// New interfaces backed by the Data.Dapr project
+// Infrastructure registrations
 builder.Services.AddScoped<IRideStateStore, DaprRideStateStore>();
 builder.Services.AddScoped<IRideStateRepository, RideStateRepository>();
 builder.Services.AddScoped<RideCommandHandlers>();
 builder.Services.AddHostedService<RideSeedService>();
 
-// Domain handlers (vertical slices)
-builder.Services.AddScoped<GetRideHandler>();
-builder.Services.AddScoped<StartRideHandler>();
-builder.Services.AddScoped<PauseRideHandler>();
-builder.Services.AddScoped<ResumeRideHandler>();
-builder.Services.AddScoped<StopRideHandler>();
+// Domain handlers via module registration
+builder.Services.AddRidesModule();
 
 // Api-only handlers (demo mode, uses DaprClient directly)
 builder.Services.AddScoped<SimulateMalfunctionHandler>();
