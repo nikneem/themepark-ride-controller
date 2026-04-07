@@ -37,6 +37,7 @@
     <Project Path="src/refunds/ThemePark.Refunds/ThemePark.Refunds.csproj" />
   </Folder>
   <Folder Name="/src/rides/">
+    <Project Path="src/rides/ThemePark.Rides.Api.Tests/ThemePark.Rides.Api.Tests.csproj" />
     <Project Path="src/rides/ThemePark.Rides.Api/ThemePark.Rides.Api.csproj" />
     <Project Path="src/rides/ThemePark.Rides.Tests/ThemePark.Rides.Tests.csproj" />
     <Project Path="src/rides/ThemePark.Rides.Transactions/ThemePark.Rides.Transactions.csproj" />
