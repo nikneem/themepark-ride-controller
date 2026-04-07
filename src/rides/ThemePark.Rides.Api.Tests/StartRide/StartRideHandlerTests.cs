@@ -21,9 +21,7 @@ public sealed class StartRideHandlerTests
         var state = new RideState(rideId, "Space Coaster", RideStatus.Idle, 12, 0, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString());
-
-        Assert.True(result.IsSuccess);
+        var result = await _handler.HandleAsync(new StartRideCommand(rideId.ToString()));
         _store.Verify(s => s.SaveAsync(
             It.Is<RideState>(r => r.OperationalStatus == RideStatus.Running),
             It.IsAny<CancellationToken>()), Times.Once);
@@ -34,7 +32,7 @@ public sealed class StartRideHandlerTests
     {
         _store.Setup(s => s.GetAsync("missing", It.IsAny<CancellationToken>())).ReturnsAsync((RideState?)null);
 
-        var result = await _handler.HandleAsync("missing");
+        var result = await _handler.HandleAsync(new StartRideCommand("missing"));
 
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
@@ -46,7 +44,7 @@ public sealed class StartRideHandlerTests
         var state = new RideState(rideId, "Space Coaster", RideStatus.Running, 12, 4, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString());
+        var result = await _handler.HandleAsync(new StartRideCommand(rideId.ToString()));
 
         Assert.Equal(OperationErrorKind.Conflict, result.ErrorKind);
         _store.Verify(s => s.SaveAsync(It.IsAny<RideState>(), It.IsAny<CancellationToken>()), Times.Never);

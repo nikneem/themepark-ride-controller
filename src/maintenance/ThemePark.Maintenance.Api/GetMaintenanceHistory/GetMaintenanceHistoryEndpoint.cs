@@ -12,7 +12,7 @@ public static class GetMaintenanceHistoryEndpoint
             GetMaintenanceHistoryHandler handler,
             CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync(rideId, ct);
+            var result = await handler.HandleAsync(new GetMaintenanceHistoryQuery(rideId), ct);
             return result.IsSuccess
                 ? Results.Ok(result.Value)
                 : Results.NotFound();

@@ -11,7 +11,7 @@ public static class ClearMascotEndpoint
         app.MapPost("/mascots/{mascotId}/clear",
             async (string mascotId, ClearMascotHandler handler, CancellationToken ct) =>
             {
-                var result = await handler.HandleAsync(mascotId, ct);
+                var result = await handler.HandleAsync(new ClearMascotCommand(mascotId), ct);
                 return result.IsSuccess
                     ? Results.Ok(result.Value)
                     : Results.NotFound();

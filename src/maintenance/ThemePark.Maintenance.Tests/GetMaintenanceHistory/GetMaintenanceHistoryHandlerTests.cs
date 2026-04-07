@@ -25,7 +25,7 @@ public sealed class GetMaintenanceHistoryHandlerTests
         _stateStore.Setup(s => s.GetRideHistoryAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<Guid>());
 
-        var result = await CreateSut().HandleAsync(Guid.NewGuid());
+        var result = await CreateSut().HandleAsync(new GetMaintenanceHistoryQuery(Guid.NewGuid()));
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
@@ -41,7 +41,7 @@ public sealed class GetMaintenanceHistoryHandlerTests
         _stateStore.Setup(s => s.GetRecordAsync(record.MaintenanceId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(record);
 
-        var result = await CreateSut().HandleAsync(rideId);
+        var result = await CreateSut().HandleAsync(new GetMaintenanceHistoryQuery(rideId));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(rideId, result.Value!.RideId);
@@ -63,7 +63,7 @@ public sealed class GetMaintenanceHistoryHandlerTests
         _stateStore.Setup(s => s.GetRecordAsync(id2, It.IsAny<CancellationToken>()))
             .ReturnsAsync(record);
 
-        var result = await CreateSut().HandleAsync(rideId);
+        var result = await CreateSut().HandleAsync(new GetMaintenanceHistoryQuery(rideId));
 
         Assert.True(result.IsSuccess);
         Assert.Single(result.Value!.History);

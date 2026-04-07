@@ -4,6 +4,7 @@ using ThemePark.EventContracts.Events;
 using ThemePark.Maintenance.Abstractions.DataTransferObjects;
 using ThemePark.Maintenance.State;
 using ThemePark.Shared;
+using ThemePark.Shared.Cqrs;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Maintenance.Features.CompleteMaintenanceRequest;
@@ -11,16 +12,17 @@ namespace ThemePark.Maintenance.Features.CompleteMaintenanceRequest;
 public sealed class CompleteMaintenanceRequestHandler(
     IMaintenanceStateStore stateStore,
     DaprClient daprClient)
+    : ICommandHandler<CompleteMaintenanceRequestCommand, OperationResult<CompleteMaintenanceRequestResponse>>
 {
     private static readonly ActivitySource ActivitySource = new("ThemePark.Maintenance");
 
     public async Task<OperationResult<CompleteMaintenanceRequestResponse>> HandleAsync(
         CompleteMaintenanceRequestCommand command,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         using var activity = ActivitySource.StartActivity("CompleteMaintenanceRequest");
 
-        var record = await stateStore.GetRecordAsync(command.MaintenanceId, ct);
+        var record = await stateStore.GetRecordAsync(command.MaintenanceId, cancellationToken);
         if (record is null)
             return OperationResult<CompleteMaintenanceRequestResponse>.NotFound();
 
@@ -30,7 +32,7 @@ public sealed class CompleteMaintenanceRequestHandler(
 
         var completedAt = DateTimeOffset.UtcNow;
         var updated = record.WithStatus(MaintenanceStatus.Completed, completedAt);
-        await stateStore.SaveRecordAsync(updated, ct);
+        await stateStore.SaveRecordAsync(updated, cancellationToken);
 
         var evt = new MaintenanceCompletedEvent(
             Guid.NewGuid(),
@@ -38,7 +40,7 @@ public sealed class CompleteMaintenanceRequestHandler(
             record.RideId,
             completedAt);
 
-        await daprClient.PublishEventAsync("themepark-pubsub", "maintenance.completed", evt, ct);
+        await daprClient.PublishEventAsync("themepark-pubsub", "maintenance.completed", evt, cancellationToken);
 
         activity?.SetTag("maintenance.id", command.MaintenanceId);
         activity?.SetTag("duration.minutes", updated.DurationMinutes);

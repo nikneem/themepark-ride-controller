@@ -9,7 +9,7 @@ public static class ResumeRideEndpoint
     {
         routes.MapPost("/rides/{rideId}/resume", async (string rideId, ResumeRideHandler handler, CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync(rideId, ct);
+            var result = await handler.HandleAsync(new ResumeRideCommand(rideId), ct);
             return result.IsSuccess
                 ? Results.Ok()
                 : result.ErrorKind == OperationErrorKind.NotFound

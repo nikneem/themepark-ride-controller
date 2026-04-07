@@ -3,11 +3,13 @@ using ThemePark.Refunds.Abstractions.DataTransferObjects;
 using ThemePark.Refunds.Models;
 using ThemePark.Refunds.State;
 using ThemePark.Shared;
+using ThemePark.Shared.Cqrs;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Refunds.Features.IssueRefund;
 
 public sealed class IssueRefundHandler(IRefundStateStore stateStore)
+    : ICommandHandler<IssueRefundRequest, OperationResult<IssueRefundResponse>>
 {
     private const decimal RefundAmountPerPassenger = 10.00m;
     private const int HistoryCap = 20;
@@ -15,7 +17,7 @@ public sealed class IssueRefundHandler(IRefundStateStore stateStore)
 
     public async Task<OperationResult<IssueRefundResponse>> HandleAsync(
         IssueRefundRequest request,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         using var activity = ActivitySource.StartActivity("IssueRefund");
 
@@ -29,7 +31,7 @@ public sealed class IssueRefundHandler(IRefundStateStore stateStore)
             return OperationResult<IssueRefundResponse>.BadRequest(
                 $"Invalid reason '{request.Reason}'. Valid values: MechanicalFailure, WeatherClosure, OperationalDecision.");
 
-        var history = await stateStore.GetHistoryAsync(request.RideId, ct);
+        var history = await stateStore.GetHistoryAsync(request.RideId, cancellationToken);
         var existing = history.FirstOrDefault(s => s.WorkflowId == request.WorkflowId);
         if (existing is not null)
         {
@@ -58,7 +60,7 @@ public sealed class IssueRefundHandler(IRefundStateStore stateStore)
             voucherCount,
             processedAt);
 
-        await stateStore.SaveBatchAsync(batch, ct);
+        await stateStore.SaveBatchAsync(batch, cancellationToken);
 
         var summary = new RefundBatchSummary(
             refundBatchId, request.WorkflowId, reason,
@@ -69,7 +71,7 @@ public sealed class IssueRefundHandler(IRefundStateStore stateStore)
         if (updatedHistory.Count > HistoryCap)
             updatedHistory = updatedHistory.Take(HistoryCap).ToList();
 
-        await stateStore.SaveHistoryAsync(request.RideId, updatedHistory, ct);
+        await stateStore.SaveHistoryAsync(request.RideId, updatedHistory, cancellationToken);
 
         activity?.SetTag("refund.batch_id", refundBatchId);
         activity?.SetTag("refund.total_amount", totalAmount);

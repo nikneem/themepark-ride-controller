@@ -5,6 +5,7 @@ using ThemePark.Maintenance.Abstractions.DataTransferObjects;
 using ThemePark.Maintenance.Models;
 using ThemePark.Maintenance.State;
 using ThemePark.Shared;
+using ThemePark.Shared.Cqrs;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Maintenance.Features.CreateMaintenanceRequest;
@@ -12,12 +13,13 @@ namespace ThemePark.Maintenance.Features.CreateMaintenanceRequest;
 public sealed class CreateMaintenanceRequestHandler(
     IMaintenanceStateStore stateStore,
     DaprClient daprClient)
+    : ICommandHandler<CreateMaintenanceRequestCommand, OperationResult<CreateMaintenanceRequestResponse>>
 {
     private static readonly ActivitySource ActivitySource = new("ThemePark.Maintenance");
 
     public async Task<OperationResult<CreateMaintenanceRequestResponse>> HandleAsync(
         CreateMaintenanceRequestCommand command,
-        CancellationToken ct = default)
+        CancellationToken cancellationToken = default)
     {
         using var activity = ActivitySource.StartActivity("CreateMaintenanceRequest");
 
@@ -38,8 +40,8 @@ public sealed class CreateMaintenanceRequestHandler(
             command.RequestedAt == default ? DateTimeOffset.UtcNow : command.RequestedAt,
             null);
 
-        await stateStore.SaveRecordAsync(record, ct);
-        await stateStore.AppendToRideHistoryAsync(command.RideId, maintenanceId, ct);
+        await stateStore.SaveRecordAsync(record, cancellationToken);
+        await stateStore.AppendToRideHistoryAsync(command.RideId, maintenanceId, cancellationToken);
 
         var evt = new MaintenanceRequestedEvent(
             Guid.NewGuid(),
@@ -48,7 +50,7 @@ public sealed class CreateMaintenanceRequestHandler(
             reason.ToString(),
             record.RequestedAt);
 
-        await daprClient.PublishEventAsync("themepark-pubsub", "maintenance.requested", evt, ct);
+        await daprClient.PublishEventAsync("themepark-pubsub", "maintenance.requested", evt, cancellationToken);
 
         activity?.SetTag("maintenance.id", maintenanceId);
         activity?.SetTag("ride.id", command.RideId);

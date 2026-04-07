@@ -4,12 +4,16 @@ using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.State;
 using ThemePark.Mascots.Zones;
 using ThemePark.Shared;
+using ThemePark.Shared.Cqrs;
 
 namespace ThemePark.Mascots.Features.SimulateIntrusion;
 
 public sealed class SimulateIntrusionHandler(IMascotStateStore store, DaprClient daprClient)
+    : ICommandHandler<SimulateIntrusionRequest, OperationResult>
 {
-    public async Task<OperationResult> HandleAsync(SimulateIntrusionRequest request, CancellationToken ct = default)
+    public async Task<OperationResult> HandleAsync(
+        SimulateIntrusionRequest request,
+        CancellationToken cancellationToken = default)
     {
         var mascot = store.GetById(request.MascotId);
         if (mascot is null)
@@ -31,7 +35,7 @@ public sealed class SimulateIntrusionHandler(IMascotStateStore store, DaprClient
                 DateTimeOffset.UtcNow);
 
             await daprClient.PublishEventAsync(
-                "themepark-pubsub", "mascot.in-restricted-zone", evt, ct);
+                "themepark-pubsub", "mascot.in-restricted-zone", evt, cancellationToken);
         }
 
         return OperationResult.Success();

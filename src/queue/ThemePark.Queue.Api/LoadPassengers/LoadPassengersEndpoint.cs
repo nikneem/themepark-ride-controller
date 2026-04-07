@@ -11,7 +11,7 @@ public static class LoadPassengersEndpoint
         routes.MapPost("/queue/{rideId}/load",
             async (string rideId, LoadPassengersRequest request, LoadPassengersHandler handler, CancellationToken ct) =>
             {
-                var result = await handler.HandleAsync(rideId, request, ct);
+                var result = await handler.HandleAsync(new LoadPassengersCommand(rideId, request.Capacity), ct);
                 return result.IsSuccess
                     ? Results.Ok(result.Value)
                     : Results.Conflict(new { error = result.Error });

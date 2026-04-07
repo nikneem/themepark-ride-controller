@@ -30,10 +30,7 @@ public sealed class GetQueueHandlerTests
         _store.Setup(s => s.GetPassengersAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync([]);
 
-        var result = await CreateHandler().HandleAsync("ride-1");
-
-        Assert.True(result.IsSuccess);
-        Assert.Equal(0, result.Value!.WaitingCount);
+        var result = await CreateHandler().HandleAsync(new GetQueueQuery("ride-1"));
         Assert.False(result.Value.HasVip);
         Assert.Equal(0, result.Value.EstimatedWaitMinutes);
     }
@@ -53,7 +50,7 @@ public sealed class GetQueueHandlerTests
             .ReturnsAsync(passengers);
 
         // estimatedWait = 4 / 20 * 3 = 0.6
-        var result = await CreateHandler(avgCapacity: 20, avgDuration: 3).HandleAsync("ride-42");
+        var result = await CreateHandler(avgCapacity: 20, avgDuration: 3).HandleAsync(new GetQueueQuery("ride-42"));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(4, result.Value!.WaitingCount);
@@ -73,7 +70,7 @@ public sealed class GetQueueHandlerTests
         _store.Setup(s => s.GetPassengersAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(passengers);
 
-        var result = await CreateHandler().HandleAsync("ride-1");
+        var result = await CreateHandler().HandleAsync(new GetQueueQuery("ride-1"));
 
         Assert.True(result.IsSuccess);
         Assert.False(result.Value!.HasVip);

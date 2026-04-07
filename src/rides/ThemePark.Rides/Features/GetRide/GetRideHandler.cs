@@ -1,14 +1,18 @@
 using ThemePark.Rides.Abstractions.DataTransferObjects;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared;
+using ThemePark.Shared.Cqrs;
 
 namespace ThemePark.Rides.Features.GetRide;
 
 public sealed class GetRideHandler(IRideStateStore store)
+    : IQueryHandler<GetRideQuery, OperationResult<RideStateDto>>
 {
-    public async Task<OperationResult<RideStateDto>> HandleAsync(string rideId, CancellationToken ct = default)
+    public async Task<OperationResult<RideStateDto>> HandleAsync(
+        GetRideQuery query,
+        CancellationToken cancellationToken = default)
     {
-        var state = await store.GetAsync(rideId, ct);
+        var state = await store.GetAsync(query.RideId, cancellationToken);
         if (state is null)
             return OperationResult<RideStateDto>.NotFound();
 

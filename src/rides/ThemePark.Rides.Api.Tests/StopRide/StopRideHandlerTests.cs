@@ -21,7 +21,7 @@ public sealed class StopRideHandlerTests
         var state = new RideState(rideId, "Dragon's Lair", RideStatus.Running, 8, 6, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString());
+        var result = await _handler.HandleAsync(new StopRideCommand(rideId.ToString()));
 
         Assert.True(result.IsSuccess);
         _store.Verify(s => s.SaveAsync(
@@ -36,7 +36,7 @@ public sealed class StopRideHandlerTests
         var state = new RideState(rideId, "Dragon's Lair", RideStatus.Maintenance, 8, 0, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString());
+        var result = await _handler.HandleAsync(new StopRideCommand(rideId.ToString()));
 
         Assert.Equal(OperationErrorKind.Conflict, result.ErrorKind);
         _store.Verify(s => s.SaveAsync(It.IsAny<RideState>(), It.IsAny<CancellationToken>()), Times.Never);

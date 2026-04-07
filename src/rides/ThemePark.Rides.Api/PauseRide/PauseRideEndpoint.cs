@@ -9,7 +9,7 @@ public static class PauseRideEndpoint
     {
         routes.MapPost("/rides/{rideId}/pause", async (string rideId, PauseRideRequest request, PauseRideHandler handler, CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync(rideId, new PauseRideCommand(request.Reason), ct);
+            var result = await handler.HandleAsync(new PauseRideCommand(rideId, request.Reason), ct);
             return result.IsSuccess
                 ? Results.Ok()
                 : result.ErrorKind == OperationErrorKind.NotFound

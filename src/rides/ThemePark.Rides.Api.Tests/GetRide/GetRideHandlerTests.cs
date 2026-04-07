@@ -22,7 +22,7 @@ public sealed class GetRideHandlerTests
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>()))
               .ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString());
+        var result = await _handler.HandleAsync(new GetRideQuery(rideId.ToString()));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(rideId, result.Value!.RideId);
@@ -36,7 +36,7 @@ public sealed class GetRideHandlerTests
         _store.Setup(s => s.GetAsync("unknown", It.IsAny<CancellationToken>()))
               .ReturnsAsync((RideState?)null);
 
-        var result = await _handler.HandleAsync("unknown");
+        var result = await _handler.HandleAsync(new GetRideQuery("unknown"));
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);

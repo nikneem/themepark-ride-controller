@@ -12,7 +12,7 @@ public static class GetRefundHistoryEndpoint
             GetRefundHistoryHandler handler,
             CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync(rideId, ct);
+            var result = await handler.HandleAsync(new GetRefundHistoryQuery(rideId), ct);
             return Results.Ok(result.Value);
         })
         .WithName("GetRefundHistory")

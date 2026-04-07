@@ -10,7 +10,7 @@ public static class GetQueueEndpoint
     {
         routes.MapGet("/queue/{rideId}", async (string rideId, GetQueueHandler handler, CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync(rideId, ct);
+            var result = await handler.HandleAsync(new GetQueueQuery(rideId), ct);
             return Results.Ok(result.Value);
         })
         .WithName("GetQueue")

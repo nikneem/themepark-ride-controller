@@ -25,9 +25,6 @@ builder.Services.AddHostedService<RideSeedService>();
 // Domain handlers via module registration
 builder.Services.AddRidesModule();
 
-// Api-only handlers (demo mode, uses DaprClient directly)
-builder.Services.AddScoped<SimulateMalfunctionHandler>();
-
 var app = builder.Build();
 
 app.MapDefaultEndpoints();

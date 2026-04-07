@@ -17,7 +17,7 @@ public sealed class PauseRideHandlerTests
     [Fact]
     public async Task HandleAsync_EmptyReason_Returns400()
     {
-        var result = await _handler.HandleAsync("any", new PauseRideCommand(Reason: ""));
+        var result = await _handler.HandleAsync(new PauseRideCommand("any", Reason: ""));
 
         Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);
     }
@@ -27,7 +27,7 @@ public sealed class PauseRideHandlerTests
     {
         _store.Setup(s => s.GetAsync("missing", It.IsAny<CancellationToken>())).ReturnsAsync((RideState?)null);
 
-        var result = await _handler.HandleAsync("missing", new PauseRideCommand("Safety check"));
+        var result = await _handler.HandleAsync(new PauseRideCommand("missing", "Safety check"));
 
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
@@ -39,7 +39,7 @@ public sealed class PauseRideHandlerTests
         var state = new RideState(rideId, "Haunted Mansion", RideStatus.Idle, 16, 0, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString(), new PauseRideCommand("Emergency"));
+        var result = await _handler.HandleAsync(new PauseRideCommand(rideId.ToString(), "Emergency"));
 
         Assert.Equal(OperationErrorKind.Conflict, result.ErrorKind);
         _store.Verify(s => s.SaveAsync(It.IsAny<RideState>(), It.IsAny<CancellationToken>()), Times.Never);
@@ -52,7 +52,7 @@ public sealed class PauseRideHandlerTests
         var state = new RideState(rideId, "Haunted Mansion", RideStatus.Running, 16, 8, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
 
-        var result = await _handler.HandleAsync(rideId.ToString(), new PauseRideCommand("Maintenance check"));
+        var result = await _handler.HandleAsync(new PauseRideCommand(rideId.ToString(), "Maintenance check"));
 
         Assert.True(result.IsSuccess);
         _store.Verify(s => s.SaveAsync(

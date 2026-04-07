@@ -4,14 +4,18 @@ using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.State;
 using ThemePark.Mascots.Zones;
 using ThemePark.Shared;
+using ThemePark.Shared.Cqrs;
 
 namespace ThemePark.Mascots.Features.ClearMascot;
 
 public sealed class ClearMascotHandler(IMascotStateStore store, DaprClient daprClient)
+    : ICommandHandler<ClearMascotCommand, OperationResult<ClearMascotResponse>>
 {
-    public async Task<OperationResult<ClearMascotResponse>> HandleAsync(string mascotId, CancellationToken ct = default)
+    public async Task<OperationResult<ClearMascotResponse>> HandleAsync(
+        ClearMascotCommand command,
+        CancellationToken cancellationToken = default)
     {
-        var mascot = store.GetById(mascotId);
+        var mascot = store.GetById(command.MascotId);
 
         if (mascot is null)
             return OperationResult<ClearMascotResponse>.NotFound();
@@ -22,12 +26,12 @@ public sealed class ClearMascotHandler(IMascotStateStore store, DaprClient daprC
         var clearedFromRideId = mascot.AffectedRideId.Value;
         var clearedAt = DateTimeOffset.UtcNow;
 
-        store.TryUpdateZone(mascotId, MascotZones.ParkCentral, out _);
+        store.TryUpdateZone(command.MascotId, MascotZones.ParkCentral, out _);
 
-        var evt = new MascotClearedEvent(mascotId, clearedFromRideId, clearedAt);
-        await daprClient.PublishEventAsync("themepark-pubsub", "mascot.cleared", evt, ct);
+        var evt = new MascotClearedEvent(command.MascotId, clearedFromRideId, clearedAt);
+        await daprClient.PublishEventAsync("themepark-pubsub", "mascot.cleared", evt, cancellationToken);
 
         return OperationResult<ClearMascotResponse>.Success(
-            new ClearMascotResponse(mascotId, clearedFromRideId, clearedAt));
+            new ClearMascotResponse(command.MascotId, clearedFromRideId, clearedAt));
     }
 }

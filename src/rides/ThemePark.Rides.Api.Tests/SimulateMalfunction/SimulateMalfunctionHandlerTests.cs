@@ -1,11 +1,11 @@
 using Dapr.Client;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using ThemePark.EventContracts.Events;
 using ThemePark.Rides.Infrastructure;
-using ThemePark.Rides.Api.SimulateMalfunction;
+using ThemePark.Rides.Features.SimulateMalfunction;
 using ThemePark.Rides.Models;
+using ThemePark.Shared;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Rides.Api.Tests.SimulateMalfunction;
@@ -27,29 +27,31 @@ public sealed class SimulateMalfunctionHandlerTests
             .Build();
 
     [Fact]
-    public async Task HandleAsync_DemoModeDisabled_Returns404()
+    public async Task HandleAsync_DemoModeDisabled_ReturnsNotFound()
     {
         var handler = CreateHandler(demoMode: false);
 
-        var result = await handler.HandleAsync("any-ride");
+        var result = await handler.HandleAsync(new SimulateMalfunctionCommand("any-ride"));
 
-        Assert.IsType<NotFound>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
         _store.Verify(s => s.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task HandleAsync_DemoModeEnabled_RideNotFound_Returns404()
+    public async Task HandleAsync_DemoModeEnabled_RideNotFound_ReturnsNotFound()
     {
         _store.Setup(s => s.GetAsync("missing", It.IsAny<CancellationToken>())).ReturnsAsync((RideState?)null);
         var handler = CreateHandler(demoMode: true);
 
-        var result = await handler.HandleAsync("missing");
+        var result = await handler.HandleAsync(new SimulateMalfunctionCommand("missing"));
 
-        Assert.IsType<NotFound>(result);
+        Assert.False(result.IsSuccess);
+        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 
     [Fact]
-    public async Task HandleAsync_DemoModeEnabled_RideFound_PublishesEventAndReturns200()
+    public async Task HandleAsync_DemoModeEnabled_RideFound_PublishesEventAndReturnsSuccess()
     {
         var rideId = Guid.NewGuid();
         var state = new RideState(rideId, "Thunder Mountain", RideStatus.Running, 24, 10, null);
@@ -63,9 +65,9 @@ public sealed class SimulateMalfunctionHandlerTests
 
         var handler = CreateHandler(demoMode: true);
 
-        var result = await handler.HandleAsync(rideId.ToString());
+        var result = await handler.HandleAsync(new SimulateMalfunctionCommand(rideId.ToString()));
 
-        Assert.IsType<Ok>(result);
+        Assert.True(result.IsSuccess);
         _dapr.Verify(d => d.PublishEventAsync(
             "themepark-pubsub",
             "ride.malfunction",

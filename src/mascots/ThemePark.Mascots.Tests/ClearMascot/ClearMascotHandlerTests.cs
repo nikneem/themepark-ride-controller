@@ -29,7 +29,7 @@ public class ClearMascotHandlerTests
         store.TryUpdateZone("mascot-001", MascotZones.ZoneA, out _);
         var (handler, dapr) = CreateHandler(store);
 
-        var result = await handler.HandleAsync("mascot-001");
+        var result = await handler.HandleAsync(new ClearMascotCommand("mascot-001"));
 
         Assert.True(result.IsSuccess);
         Assert.Equal("mascot-001", result.Value!.MascotId);
@@ -43,7 +43,7 @@ public class ClearMascotHandlerTests
         store.TryUpdateZone("mascot-001", MascotZones.ZoneB, out _);
         var (handler, _) = CreateHandler(store);
 
-        await handler.HandleAsync("mascot-001");
+        await handler.HandleAsync(new ClearMascotCommand("mascot-001"));
 
         Assert.Equal(MascotZones.ParkCentral, store.GetById("mascot-001")!.CurrentZone);
     }
@@ -55,7 +55,7 @@ public class ClearMascotHandlerTests
         store.TryUpdateZone("mascot-001", MascotZones.ZoneC, out _);
         var (handler, dapr) = CreateHandler(store);
 
-        await handler.HandleAsync("mascot-001");
+        await handler.HandleAsync(new ClearMascotCommand("mascot-001"));
 
         dapr.Verify(
             d => d.PublishEventAsync(
@@ -71,7 +71,7 @@ public class ClearMascotHandlerTests
         var store = new InMemoryMascotStateStore();
         var (handler, _) = CreateHandler(store);
 
-        var result = await handler.HandleAsync("unknown-999");
+        var result = await handler.HandleAsync(new ClearMascotCommand("unknown-999"));
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
@@ -83,7 +83,7 @@ public class ClearMascotHandlerTests
         var store = new InMemoryMascotStateStore();
         var (handler, _) = CreateHandler(store);
 
-        var result = await handler.HandleAsync("mascot-001");
+        var result = await handler.HandleAsync(new ClearMascotCommand("mascot-001"));
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
@@ -96,7 +96,7 @@ public class ClearMascotHandlerTests
         store.TryUpdateZone("mascot-002", MascotZones.Backstage, out _);
         var (handler, _) = CreateHandler(store);
 
-        var result = await handler.HandleAsync("mascot-002");
+        var result = await handler.HandleAsync(new ClearMascotCommand("mascot-002"));
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);

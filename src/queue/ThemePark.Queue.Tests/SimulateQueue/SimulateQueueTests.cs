@@ -30,7 +30,7 @@ public sealed class SimulateQueueHandlerTests
             .Callback<string, IReadOnlyList<Passenger>, CancellationToken>((_, p, _) => saved = p)
             .Returns(Task.CompletedTask);
 
-        await _handler.HandleAsync("ride-1", new SimulateQueueRequest(Count: 20, VipProbability: 0.2));
+        await _handler.HandleAsync(new SimulateQueueCommand("ride-1", Count: 20, VipProbability: 0.2));
 
         Assert.NotNull(saved);
         Assert.Equal(20, saved!.Count);
@@ -43,7 +43,7 @@ public sealed class SimulateQueueHandlerTests
                 "ride-1", It.IsAny<IReadOnlyList<Passenger>>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
 
-        await _handler.HandleAsync("ride-1", new SimulateQueueRequest(Count: 10));
+        await _handler.HandleAsync(new SimulateQueueCommand("ride-1", Count: 10));
 
         // SavePassengersAsync called exactly once — replace, not append
         _store.Verify(s => s.SavePassengersAsync(
@@ -59,7 +59,7 @@ public sealed class SimulateQueueHandlerTests
             .Callback<string, IReadOnlyList<Passenger>, CancellationToken>((_, p, _) => saved = p)
             .Returns(Task.CompletedTask);
 
-        await _handler.HandleAsync("ride-1", new SimulateQueueRequest(Count: 100));
+        await _handler.HandleAsync(new SimulateQueueCommand("ride-1", Count: 100));
 
         Assert.NotNull(saved);
         var distinctIds = saved!.Select(p => p.PassengerId).Distinct().Count();

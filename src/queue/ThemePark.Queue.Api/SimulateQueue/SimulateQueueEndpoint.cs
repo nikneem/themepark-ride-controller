@@ -14,7 +14,7 @@ public static class SimulateQueueEndpoint
         routes.MapPost("/queue/{rideId}/simulate-queue",
             async (string rideId, SimulateQueueRequest request, SimulateQueueHandler handler, CancellationToken ct) =>
             {
-                var result = await handler.HandleAsync(rideId, request, ct);
+                var result = await handler.HandleAsync(new SimulateQueueCommand(rideId, request.Count, request.VipProbability), ct);
                 return Results.Ok(result.Value);
             })
             .WithName("SimulateQueue")

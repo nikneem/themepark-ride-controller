@@ -1,27 +1,28 @@
 using ThemePark.Queue.Abstractions.DataTransferObjects;
 using ThemePark.Queue.State;
 using ThemePark.Shared;
+using ThemePark.Shared.Cqrs;
 
 namespace ThemePark.Queue.Features.LoadPassengers;
 
 public sealed class LoadPassengersHandler(IQueueStateStore stateStore)
+    : ICommandHandler<LoadPassengersCommand, OperationResult<LoadPassengersResponse>>
 {
     private const int MaxRetries = 5;
 
     public async Task<OperationResult<LoadPassengersResponse>> HandleAsync(
-        string rideId,
-        LoadPassengersRequest request,
-        CancellationToken ct = default)
+        LoadPassengersCommand command,
+        CancellationToken cancellationToken = default)
     {
         for (var attempt = 0; attempt < MaxRetries; attempt++)
         {
-            var (passengers, etag) = await stateStore.GetPassengersWithETagAsync(rideId, ct);
+            var (passengers, etag) = await stateStore.GetPassengersWithETagAsync(command.RideId, cancellationToken);
 
             var queue = passengers.ToList();
-            var toLoad = queue.Take(request.Capacity).ToList();
-            var remainder = queue.Skip(request.Capacity).ToList();
+            var toLoad = queue.Take(command.Capacity).ToList();
+            var remainder = queue.Skip(command.Capacity).ToList();
 
-            var saved = await stateStore.TrySavePassengersAsync(rideId, remainder, etag, ct);
+            var saved = await stateStore.TrySavePassengersAsync(command.RideId, remainder, etag, cancellationToken);
 
             if (!saved) continue;
 

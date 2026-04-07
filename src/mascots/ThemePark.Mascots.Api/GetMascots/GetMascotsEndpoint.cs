@@ -7,9 +7,9 @@ public static class GetMascotsEndpoint
 {
     public static IEndpointRouteBuilder MapGetMascots(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/mascots", (GetMascotsHandler handler) =>
+        app.MapGet("/mascots", async (GetMascotsHandler handler, CancellationToken ct) =>
         {
-            var result = handler.Handle();
+            var result = await handler.HandleAsync(new GetMascotsQuery(), ct);
             return Results.Ok(result.Value);
         })
         .Produces<IReadOnlyList<MascotDto>>(StatusCodes.Status200OK);

@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ThemePark.Rides.Features.GetRide;
 using ThemePark.Rides.Features.PauseRide;
 using ThemePark.Rides.Features.ResumeRide;
+using ThemePark.Rides.Features.SimulateMalfunction;
 using ThemePark.Rides.Features.StartRide;
 using ThemePark.Rides.Features.StopRide;
 
@@ -16,6 +17,7 @@ public static class RidesModule
         services.AddScoped<PauseRideHandler>();
         services.AddScoped<ResumeRideHandler>();
         services.AddScoped<StopRideHandler>();
+        services.AddScoped<SimulateMalfunctionHandler>();
         return services;
     }
 }

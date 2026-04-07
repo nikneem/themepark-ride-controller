@@ -20,7 +20,7 @@ public sealed class GetRefundHistoryHandlerTests
         _store.Setup(s => s.GetHistoryAsync(_rideId, It.IsAny<CancellationToken>()))
               .ReturnsAsync([]);
 
-        var result = await CreateHandler().HandleAsync(_rideId);
+        var result = await CreateHandler().HandleAsync(new GetRefundHistoryQuery(_rideId));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(_rideId, result.Value!.RideId);
@@ -39,7 +39,7 @@ public sealed class GetRefundHistoryHandlerTests
         _store.Setup(s => s.GetHistoryAsync(_rideId, It.IsAny<CancellationToken>()))
               .ReturnsAsync(summaries);
 
-        var result = await CreateHandler().HandleAsync(_rideId);
+        var result = await CreateHandler().HandleAsync(new GetRefundHistoryQuery(_rideId));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(_rideId, result.Value!.RideId);

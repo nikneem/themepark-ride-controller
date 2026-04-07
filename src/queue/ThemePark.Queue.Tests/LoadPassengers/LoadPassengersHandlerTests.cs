@@ -35,7 +35,7 @@ public sealed class LoadPassengersHandlerTests
             .ToList();
         SetupQueue("ride-1", passengers);
 
-        var result = await _handler.HandleAsync("ride-1", new LoadPassengersRequest(4));
+        var result = await _handler.HandleAsync(new LoadPassengersCommand("ride-1", 4));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(4, result.Value!.LoadedCount);
@@ -51,7 +51,7 @@ public sealed class LoadPassengersHandlerTests
             .ToList();
         SetupQueue("ride-2", passengers);
 
-        var result = await _handler.HandleAsync("ride-2", new LoadPassengersRequest(10));
+        var result = await _handler.HandleAsync(new LoadPassengersCommand("ride-2", 10));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(3, result.Value!.LoadedCount);
@@ -63,7 +63,7 @@ public sealed class LoadPassengersHandlerTests
     {
         SetupQueue("ride-3", []);
 
-        var result = await _handler.HandleAsync("ride-3", new LoadPassengersRequest(4));
+        var result = await _handler.HandleAsync(new LoadPassengersCommand("ride-3", 4));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(0, result.Value!.LoadedCount);
@@ -83,7 +83,7 @@ public sealed class LoadPassengersHandlerTests
         };
         SetupQueue("ride-4", passengers);
 
-        var result = await _handler.HandleAsync("ride-4", new LoadPassengersRequest(4));
+        var result = await _handler.HandleAsync(new LoadPassengersCommand("ride-4", 4));
 
         Assert.True(result.IsSuccess);
         Assert.Equal(2, result.Value!.VipCount);
