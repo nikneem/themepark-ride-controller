@@ -25,6 +25,33 @@ When invoked:
 - Plan and write tests (TDD/BDD) with xUnit, NUnit, or MSTest
 - Improve performance (memory, async code, data access)
 
+## Git Commit Discipline
+
+When implementing code changes, **commit after every logical unit of work** so changes are easy to track and revert independently. A logical commit boundary is any of the following:
+
+- A new type (class, record, interface, enum) is complete and compiles
+- A new feature or capability is fully implemented (even if tests are not yet written)
+- Tests for a feature or behaviour are complete and passing
+- A refactor or rename is done (separate from feature work)
+- A bug fix is isolated and verified
+
+**Commit message format** — use Conventional Commits:
+```
+<type>(<scope>): <short summary>
+
+[optional body]
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+Types: `feat`, `fix`, `test`, `refactor`, `chore`, `docs`  
+Scope: the project or domain area (e.g., `rides`, `controlcenter`, `shared`)
+
+**Rules:**
+- Never batch unrelated changes into a single commit.
+- Always verify the build succeeds (`dotnet build`) before committing.
+- Run affected tests (`dotnet test`) before committing test files.
+- Keep commits small enough that reverting one does not undo unrelated work.
+
 # General C# Development
 
 - Follow the project''s own conventions first, then common C# conventions.
