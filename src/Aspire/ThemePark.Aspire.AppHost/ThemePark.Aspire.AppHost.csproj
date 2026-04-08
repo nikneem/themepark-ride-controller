@@ -1,6 +1,10 @@
 <Project Sdk="Aspire.AppHost.Sdk/13.2.1">
 
   <ItemGroup>
+    <Compile Include="..\ThemePark.Aspire.ServiceDefaults\AspireConstants.cs" Link="AspireConstants.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\rides\ThemePark.Rides.Api\ThemePark.Rides.Api.csproj" />
     <ProjectReference Include="..\..\queue\ThemePark.Queue.Api\ThemePark.Queue.Api.csproj" />
     <ProjectReference Include="..\..\maintenance\ThemePark.Maintenance.Api\ThemePark.Maintenance.Api.csproj" />
