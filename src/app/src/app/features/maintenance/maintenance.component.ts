@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { MaintenanceService } from '../../core/services/maintenance.service';
@@ -14,7 +13,7 @@ import { RideDto } from '../../core/models/ride.model';
 @Component({
   selector: 'app-maintenance',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule, SelectModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, TableModule, ButtonModule, SelectModule, PageHeaderComponent],
   templateUrl: './maintenance.component.html',
   styleUrl: './maintenance.component.scss'
 })
@@ -26,6 +25,12 @@ export class MaintenanceComponent implements OnInit {
   allHistory = signal<MaintenanceHistoryItem[]>([]);
   newRideId = '';
   newReason = '';
+
+  readonly reasonOptions = [
+    { label: 'Mechanical Failure', value: 'MechanicalFailure' },
+    { label: 'Scheduled Check', value: 'ScheduledCheck' },
+    { label: 'Failure', value: 'Failure' },
+  ];
 
   ngOnInit(): void {
     this.ridesService.getRides().subscribe({

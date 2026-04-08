@@ -10,7 +10,13 @@
       optionValue="rideId"
       placeholder="Select a ride"
     />
-    <input pInputText [(ngModel)]="newReason" placeholder="Reason for maintenance" />
+    <p-select
+      [options]="reasonOptions"
+      [(ngModel)]="newReason"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Select a reason"
+    />
     <p-button label="Create Request" icon="pi pi-plus" (onClick)="createRequest()" />
   </div>
 </div>
