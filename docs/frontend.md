@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Control Center UI is a modern **Angular (v21+)** single-page application. It gives theme park operators a real-time view of all rides, live workflow progress, chaos event alerts, and operator action controls.
+The Control Center UI is a modern **Angular (v21)** single-page application. It gives theme park operators a real-time view of all rides, live workflow progress, chaos event alerts, and operator action controls.
 
 ---
 
