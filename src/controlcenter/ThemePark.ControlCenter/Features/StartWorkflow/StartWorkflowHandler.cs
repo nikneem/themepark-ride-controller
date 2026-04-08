@@ -1,3 +1,4 @@
+using Dapr.Client;
 using Dapr.Workflow;
 using ThemePark.ControlCenter.Workflow;
 using ThemePark.Rides.Infrastructure;
@@ -13,8 +14,11 @@ namespace ThemePark.ControlCenter.Features.StartWorkflow;
 /// </summary>
 public sealed class StartWorkflowHandler(
     IRideStateRepository rideStateRepository,
-    DaprWorkflowClient workflowClient)
+    DaprWorkflowClient workflowClient,
+    DaprClient daprClient)
 {
+    private const string StoreName = "themepark-statestore";
+
     public async Task<OperationResult<StartWorkflowResponse>> HandleAsync(
         StartWorkflowCommand command,
         CancellationToken cancellationToken = default)
@@ -37,6 +41,10 @@ public sealed class StartWorkflowHandler(
             nameof(RideWorkflow),
             instanceId: workflowId,
             input: input);
+
+        // Record the active workflow instance ID so other handlers (ApproveMaintenance,
+        // ResolveChaosEvent) and pub/sub subscribers can target the correct Dapr workflow instance.
+        await daprClient.SaveStateAsync(StoreName, $"active-workflow-{command.RideId}", workflowId, cancellationToken: cancellationToken);
 
         return OperationResult<StartWorkflowResponse>.Success(new StartWorkflowResponse(workflowId));
     }

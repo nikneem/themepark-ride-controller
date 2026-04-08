@@ -11,7 +11,7 @@ public sealed class StartWorkflowHandlerTests
     private readonly IRideStateRepository _rideStateRepository = Substitute.For<IRideStateRepository>();
 
     private StartWorkflowHandler CreateHandler() =>
-        new(_rideStateRepository, null!);
+        new(_rideStateRepository, null!, null!);
 
     private static readonly string RideId = "a1b2c3d4-0001-0000-0000-000000000001";
 

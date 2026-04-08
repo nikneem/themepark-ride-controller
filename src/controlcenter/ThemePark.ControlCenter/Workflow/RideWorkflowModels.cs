@@ -18,8 +18,10 @@ public sealed record RideWorkflowInput(
     string RefundReason = "OperationalDecision");
 
 /// <summary>Final output of a RideWorkflow instance.</summary>
+/// <param name="Outcome">Human-readable outcome code, e.g. "Completed", "AbortedDueToPreFlightFailure".</param>
 public sealed record RideWorkflowOutput(
     string RideId,
     RideStatus FinalStatus,
+    string Outcome = "Completed",
     Guid? RefundBatchId = null);
 
