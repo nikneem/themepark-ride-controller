@@ -37,6 +37,27 @@ public sealed class StartRideHandlerTests
         Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
     }
 
+    /// <summary>
+    /// Verifies that a ride start is rejected when <see cref="RideStatus"/> is not <c>Idle</c>.
+    /// </summary>
+    [Theory]
+    [InlineData(RideStatus.Running)]
+    [InlineData(RideStatus.Loading)]
+    [InlineData(RideStatus.Paused)]
+    [InlineData(RideStatus.Maintenance)]
+    [InlineData(RideStatus.Failed)]
+    public async Task StartRide_WhenNotIdle_ReturnsError(RideStatus nonIdleStatus)
+    {
+        var rideId = Guid.NewGuid();
+        var state = new RideState(rideId, "Space Coaster", nonIdleStatus, 12, 4, null);
+        _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
+
+        var result = await _handler.HandleAsync(new StartRideCommand(rideId.ToString()));
+
+        Assert.Equal(OperationErrorKind.Conflict, result.ErrorKind);
+        _store.Verify(s => s.SaveAsync(It.IsAny<RideState>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     [Fact]
     public async Task HandleAsync_RideNotIdle_Returns409()
     {

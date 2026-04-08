@@ -1,19 +1,21 @@
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
-using ThemePark.Shared.Catalog;
+using ThemePark.Shared.Domain;
 using ThemePark.Shared.Enums;
 
 namespace ThemePark.Rides.Api.Startup;
 
 /// <summary>
 /// Seeds the 5 default rides into the Dapr state store on application startup.
+/// Ride data is sourced from <see cref="RideSeedData"/> in <c>ThemePark.Shared</c> — GUIDs
+/// are never declared inline in service code.
 /// Rides whose key already exists are skipped to preserve operational state across restarts.
 /// </summary>
 public sealed class RideSeedService(IRideStateStore store, ILogger<RideSeedService> logger) : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        foreach (var info in RideCatalog.All)
+        foreach (var info in RideSeedData.All)
         {
             var rideId = info.RideId.ToString();
             var existing = await store.GetAsync(rideId, cancellationToken);
@@ -38,3 +40,4 @@ public sealed class RideSeedService(IRideStateStore store, ILogger<RideSeedServi
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 }
+

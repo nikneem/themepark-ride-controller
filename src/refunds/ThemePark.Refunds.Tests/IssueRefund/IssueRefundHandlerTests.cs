@@ -98,6 +98,28 @@ public sealed class IssueRefundHandlerTests
     }
 
     [Fact]
+    public async Task RefundBatch_DuplicateWorkflowId_DoesNotCreateDuplicate()
+    {
+        var existingSummary = new RefundBatchSummary(
+            Guid.NewGuid(), WorkflowId, RefundReason.MechanicalFailure,
+            1, 10.00m, 0, DateTimeOffset.UtcNow.AddMinutes(-5));
+
+        _store.Setup(s => s.GetHistoryAsync(_rideId, It.IsAny<CancellationToken>()))
+              .ReturnsAsync([existingSummary]);
+
+        var request = new IssueRefundRequest(
+            _rideId, WorkflowId, "MechanicalFailure",
+            [new RefundPassengerRequest("p1", false)]);
+
+        var result = await CreateHandler().HandleAsync(request);
+
+        Assert.True(result.IsSuccess);
+        // Must return the original batch — no new persistence
+        _store.Verify(s => s.SaveBatchAsync(It.IsAny<RefundBatch>(), It.IsAny<CancellationToken>()), Times.Never);
+        _store.Verify(s => s.SaveHistoryAsync(It.IsAny<Guid>(), It.IsAny<IReadOnlyList<RefundBatchSummary>>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
     public async Task HistoryAt20_NewEntryAdded_OldestDropped()
     {
         var existing = Enumerable.Range(0, 20)
