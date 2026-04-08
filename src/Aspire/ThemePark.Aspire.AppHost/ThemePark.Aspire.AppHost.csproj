@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+<Project Sdk="Aspire.AppHost.Sdk/13.2.1">
 
   <ItemGroup>
     <ProjectReference Include="..\..\rides\ThemePark.Rides.Api\ThemePark.Rides.Api.csproj" />
