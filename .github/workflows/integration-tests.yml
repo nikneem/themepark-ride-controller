@@ -2,8 +2,8 @@ name: Integration Tests
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   integration-tests:
@@ -17,23 +17,23 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
+      - name: Install Dapr CLI
+        run: |
+          wget -q https://raw.githubusercontent.com/dapr/cli/master/install/install.sh -O - | /bin/bash
+          dapr init
+
       - name: Restore
         run: dotnet restore ThemePark.slnx
 
       - name: Build
         run: dotnet build ThemePark.slnx --no-restore --configuration Release
 
-      - name: Run Integration Tests
-        run: |
-          dotnet test ThemePark.slnx \
-            --no-build \
-            --configuration Release \
-            --filter "Category=Integration" \
-            --collect:"XPlat Code Coverage" \
-            --results-directory ./coverage
+      - name: Integration Test
+        run: dotnet test ThemePark.slnx --no-build --configuration Release --filter "Category=Integration" --logger "trx;LogFileName=integration-results.trx"
 
-      - name: Upload coverage report
+      - name: Upload results
         uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: coverage-integration
-          path: ./coverage
+          name: integration-test-results
+          path: '**/*.trx'

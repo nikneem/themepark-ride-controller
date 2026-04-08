@@ -20,15 +20,16 @@ public sealed class GetMaintenanceHistoryHandlerTests
             DateTimeOffset.UtcNow.AddHours(-1), DateTimeOffset.UtcNow);
 
     [Fact]
-    public async Task HandleAsync_NoHistory_ReturnsNotFound()
+    public async Task HandleAsync_NoHistory_ReturnsSuccessWithEmptyList()
     {
         _stateStore.Setup(s => s.GetRideHistoryAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Array.Empty<Guid>());
 
         var result = await CreateSut().HandleAsync(new GetMaintenanceHistoryQuery(Guid.NewGuid()));
 
-        Assert.False(result.IsSuccess);
-        Assert.Equal(OperationErrorKind.NotFound, result.ErrorKind);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Empty(result.Value.History);
     }
 
     [Fact]
