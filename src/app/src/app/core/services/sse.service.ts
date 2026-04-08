@@ -1,5 +1,6 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface SseEvent {
   type: string;
@@ -15,7 +16,7 @@ export class SseService implements OnDestroy {
 
   connect(): void {
     this.disconnect();
-    this.eventSource = new EventSource('/controlcenter/events/stream');
+    this.eventSource = new EventSource(`${environment.apiBaseUrl}/controlcenter/events/stream`);
 
     this.eventSource.addEventListener('ride-status-changed', (event: MessageEvent) => {
       try {
