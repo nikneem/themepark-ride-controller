@@ -10,7 +10,7 @@ namespace ThemePark.Maintenance.Data.Dapr;
 /// </summary>
 public sealed class DaprMaintenanceStateStore(DaprClient daprClient) : IMaintenanceStateStore
 {
-    private const string StoreName = "statestore";
+    private const string StoreName = "themepark-statestore";
     private const int HistoryCap = 20;
 
     private static string RecordKey(Guid maintenanceId) => $"maintenance-{maintenanceId}";

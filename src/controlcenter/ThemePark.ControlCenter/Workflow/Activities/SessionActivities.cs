@@ -45,7 +45,7 @@ public sealed class CleanupWorkflowActivity(DaprClient daprClient)
 {
     public override async Task<bool> RunAsync(WorkflowActivityContext context, string rideId)
     {
-        await daprClient.DeleteStateAsync("statestore", $"active-workflow-{rideId}");
+        await daprClient.DeleteStateAsync("themepark-statestore", $"active-workflow-{rideId}");
         return true;
     }
 }
@@ -67,15 +67,15 @@ public sealed class RecordSessionSummaryActivity(DaprClient daprClient)
             input.Outcome);
 
         // Persist the session summary.
-        await daprClient.SaveStateAsync("statestore", $"session-summary-{input.SessionId}", session);
+        await daprClient.SaveStateAsync("themepark-statestore", $"session-summary-{input.SessionId}", session);
 
         // Append session ID to the ride's session index (last 20 kept).
-        var index = await daprClient.GetStateAsync<List<Guid>?>("statestore", $"sessions-{input.RideId}") ?? [];
+        var index = await daprClient.GetStateAsync<List<Guid>?>("themepark-statestore", $"sessions-{input.RideId}") ?? [];
         index.Add(input.SessionId);
         if (index.Count > 20)
             index = index[^20..];
 
-        await daprClient.SaveStateAsync("statestore", $"sessions-{input.RideId}", index);
+        await daprClient.SaveStateAsync("themepark-statestore", $"sessions-{input.RideId}", index);
         return true;
     }
 }

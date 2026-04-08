@@ -10,7 +10,7 @@ namespace ThemePark.Refunds.Data.Dapr;
 /// </summary>
 public sealed class DaprRefundStateStore(DaprClient daprClient) : IRefundStateStore
 {
-    private const string StoreName = "statestore";
+    private const string StoreName = "themepark-statestore";
 
     private static string BatchKey(Guid refundBatchId) => $"refund-batch-{refundBatchId}";
     private static string HistoryKey(Guid rideId) => $"refund-history-{rideId}";
