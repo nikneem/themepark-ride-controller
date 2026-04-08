@@ -40,14 +40,19 @@ var stateStore = builder.AddDaprComponent(AspireConstants.DaprComponents.StateSt
 var controlCenterApi = builder.AddProject<Projects.ThemePark_ControlCenter_Api>(AspireConstants.Projects.ControlCenterApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var ridesApi = builder.AddProject<Projects.ThemePark_Rides_Api>(AspireConstants.Projects.RidesApi)
+    .WithEnvironment("Dapr__DemoMode", "true")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var queueApi = builder.AddProject<Projects.ThemePark_Queue_Api>(AspireConstants.Projects.QueueApi)
+    .WithEnvironment("Dapr__DemoMode", "true")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var maintenanceApi = builder.AddProject<Projects.ThemePark_Maintenance_Api>(AspireConstants.Projects.MaintenanceApi)
+    .WithEnvironment("Dapr__DemoMode", "true")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var weatherApi = builder.AddProject<Projects.ThemePark_Weather_Api>(AspireConstants.Projects.WeatherApi)
+    .WithEnvironment("Dapr__DemoMode", "true")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
 var mascotsApi = builder.AddProject<Projects.ThemePark_Mascots_Api>(AspireConstants.Projects.MascotsApi)
+    .WithEnvironment("Dapr__DemoMode", "true")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
 var refundsApi = builder.AddProject<Projects.ThemePark_Refunds_Api>(AspireConstants.Projects.RefundsApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
