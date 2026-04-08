@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.State;
@@ -29,7 +30,7 @@ public sealed class ClearMascotHandler(IMascotStateStore store, DaprClient daprC
         store.TryUpdateZone(command.MascotId, MascotZones.ParkCentral, out _);
 
         var evt = new MascotClearedEvent(command.MascotId, clearedFromRideId, clearedAt);
-        await daprClient.PublishEventAsync("themepark-pubsub", "mascot.cleared", evt, cancellationToken);
+        await daprClient.PublishEventAsync(AspireConstants.DaprComponents.PubSub, "mascot.cleared", evt, cancellationToken);
 
         return OperationResult<ClearMascotResponse>.Success(
             new ClearMascotResponse(command.MascotId, clearedFromRideId, clearedAt));

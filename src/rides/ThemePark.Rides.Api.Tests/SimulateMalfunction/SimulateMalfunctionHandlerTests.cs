@@ -1,6 +1,7 @@
 using Dapr.Client;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Features.SimulateMalfunction;
@@ -57,7 +58,7 @@ public sealed class SimulateMalfunctionHandlerTests
         var state = new RideState(rideId, "Thunder Mountain", RideStatus.Running, 24, 10, null);
         _store.Setup(s => s.GetAsync(rideId.ToString(), It.IsAny<CancellationToken>())).ReturnsAsync(state);
         _dapr.Setup(d => d.PublishEventAsync(
-                "themepark-pubsub",
+                AspireConstants.DaprComponents.PubSub,
                 "ride.malfunction",
                 It.IsAny<RideMalfunctionEvent>(),
                 It.IsAny<CancellationToken>()))
@@ -69,7 +70,7 @@ public sealed class SimulateMalfunctionHandlerTests
 
         Assert.True(result.IsSuccess);
         _dapr.Verify(d => d.PublishEventAsync(
-            "themepark-pubsub",
+            AspireConstants.DaprComponents.PubSub,
             "ride.malfunction",
             It.Is<RideMalfunctionEvent>(e => e.RideId == rideId && e.RideName == "Thunder Mountain"),
             It.IsAny<CancellationToken>()), Times.Once);

@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.Queue.Models;
 using ThemePark.Queue.State;
 
@@ -10,7 +11,7 @@ namespace ThemePark.Queue.Data.Dapr;
 /// </summary>
 public sealed class DaprQueueStateStore(DaprClient daprClient) : IQueueStateStore
 {
-    private const string StoreName = "themepark-statestore";
+    private const string StoreName = AspireConstants.DaprComponents.StateStore;
 
     private static string Key(string rideId) => $"queue-{rideId}";
 

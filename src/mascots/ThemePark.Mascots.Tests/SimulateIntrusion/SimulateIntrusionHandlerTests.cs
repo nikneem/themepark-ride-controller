@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.Data.InMemory;
@@ -54,7 +55,7 @@ public class SimulateIntrusionHandlerTests
 
         dapr.Verify(
             d => d.PublishEventAsync(
-                "themepark-pubsub", "mascot.in-restricted-zone",
+                AspireConstants.DaprComponents.PubSub, "mascot.in-restricted-zone",
                 It.IsAny<MascotInRestrictedZoneEvent>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);

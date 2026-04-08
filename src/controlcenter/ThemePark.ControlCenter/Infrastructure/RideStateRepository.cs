@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.Models;
 using ThemePark.Shared.Enums;
@@ -12,7 +13,7 @@ namespace ThemePark.ControlCenter.Infrastructure;
 /// </summary>
 public sealed class RideStateRepository(DaprClient daprClient) : IRideStateRepository
 {
-    private const string StoreName = "themepark-statestore";
+    private const string StoreName = AspireConstants.DaprComponents.StateStore;
 
     private static string Key(string rideId) => $"ride-state-{rideId}";
 

@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.Maintenance.Abstractions.DataTransferObjects;
 using ThemePark.Maintenance.Features.CreateMaintenanceRequest;
 using ThemePark.Maintenance.Models;
@@ -72,7 +73,7 @@ public sealed class CreateMaintenanceRequestHandlerTests
         await CreateSut().HandleAsync(command);
 
         _daprClient.Verify(d => d.PublishEventAsync(
-            "themepark-pubsub", "maintenance.requested",
+            AspireConstants.DaprComponents.PubSub, "maintenance.requested",
             It.IsAny<ThemePark.EventContracts.Events.MaintenanceRequestedEvent>(),
             It.IsAny<CancellationToken>()), Times.Once);
     }

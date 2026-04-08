@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Shared;
 using ThemePark.Shared.Cqrs;
@@ -29,7 +30,7 @@ public sealed class SimulateWeatherHandler(IWeatherSimulationEngine engine, Dapr
                 command.AffectedZones,
                 condition.GeneratedAt);
 
-            await daprClient.PublishEventAsync("themepark-pubsub", "weather.alert", evt, cancellationToken);
+            await daprClient.PublishEventAsync(AspireConstants.DaprComponents.PubSub, "weather.alert", evt, cancellationToken);
         }
 
         return OperationResult.Success();

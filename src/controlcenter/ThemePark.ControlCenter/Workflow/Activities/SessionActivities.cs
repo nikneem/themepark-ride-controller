@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Dapr.Workflow;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.ControlCenter.Domain;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.ControlCenter.PubSub;
@@ -45,7 +46,7 @@ public sealed class CleanupWorkflowActivity(DaprClient daprClient)
 {
     public override async Task<bool> RunAsync(WorkflowActivityContext context, string rideId)
     {
-        await daprClient.DeleteStateAsync("themepark-statestore", $"active-workflow-{rideId}");
+        await daprClient.DeleteStateAsync(AspireConstants.DaprComponents.StateStore, $"active-workflow-{rideId}");
         return true;
     }
 }
@@ -67,15 +68,15 @@ public sealed class RecordSessionSummaryActivity(DaprClient daprClient)
             input.Outcome);
 
         // Persist the session summary.
-        await daprClient.SaveStateAsync("themepark-statestore", $"session-summary-{input.SessionId}", session);
+        await daprClient.SaveStateAsync(AspireConstants.DaprComponents.StateStore, $"session-summary-{input.SessionId}", session);
 
         // Append session ID to the ride's session index (last 20 kept).
-        var index = await daprClient.GetStateAsync<List<Guid>?>("themepark-statestore", $"sessions-{input.RideId}") ?? [];
+        var index = await daprClient.GetStateAsync<List<Guid>?>(AspireConstants.DaprComponents.StateStore, $"sessions-{input.RideId}") ?? [];
         index.Add(input.SessionId);
         if (index.Count > 20)
             index = index[^20..];
 
-        await daprClient.SaveStateAsync("themepark-statestore", $"sessions-{input.RideId}", index);
+        await daprClient.SaveStateAsync(AspireConstants.DaprComponents.StateStore, $"sessions-{input.RideId}", index);
         return true;
     }
 }

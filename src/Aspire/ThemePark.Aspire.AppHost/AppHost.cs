@@ -1,4 +1,5 @@
 using Aspire.Hosting.Yarp.Transforms;
+using ThemePark.Aspire.ServiceDefaults;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -20,7 +21,7 @@ var redisHost = redis.Resource.PrimaryEndpoint.Property(EndpointProperty.Host);
 var redisPort = redis.Resource.PrimaryEndpoint.Property(EndpointProperty.Port);
 
 // Dapr pub/sub component backed by RabbitMQ.
-var pubSub = builder.AddDaprComponent("themepark-pubsub", "pubsub.rabbitmq")
+var pubSub = builder.AddDaprComponent(AspireConstants.DaprComponents.PubSub, "pubsub.rabbitmq")
     .WithMetadata("hostname", "localhost")
     .WithMetadata("port", rabbitMqPort.ToString())
     .WithMetadata("protocol", "amqp")
@@ -29,26 +30,26 @@ var pubSub = builder.AddDaprComponent("themepark-pubsub", "pubsub.rabbitmq")
     .WaitFor(rabbitmq);
 
 // Dapr state store component backed by Redis.
-var stateStore = builder.AddDaprComponent("themepark-statestore", "state.redis")
+var stateStore = builder.AddDaprComponent(AspireConstants.DaprComponents.StateStore, "state.redis")
     .WithMetadata("redisHost", ReferenceExpression.Create($"{redisHost}:{redisPort}"))
     .WithMetadata("actorStateStore", "true")
     .WaitFor(redis);
 
 // Helper to attach a Dapr sidecar referencing the shared pub/sub component.
 
-var controlCenterApi = builder.AddProject<Projects.ThemePark_ControlCenter_Api>("controlcenter-api")
+var controlCenterApi = builder.AddProject<Projects.ThemePark_ControlCenter_Api>(AspireConstants.Projects.ControlCenterApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
-var ridesApi = builder.AddProject<Projects.ThemePark_Rides_Api>("rides-api")
+var ridesApi = builder.AddProject<Projects.ThemePark_Rides_Api>(AspireConstants.Projects.RidesApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
-var queueApi = builder.AddProject<Projects.ThemePark_Queue_Api>("queue-api")
+var queueApi = builder.AddProject<Projects.ThemePark_Queue_Api>(AspireConstants.Projects.QueueApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
-var maintenanceApi = builder.AddProject<Projects.ThemePark_Maintenance_Api>("maintenance-api")
+var maintenanceApi = builder.AddProject<Projects.ThemePark_Maintenance_Api>(AspireConstants.Projects.MaintenanceApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
-var weatherApi = builder.AddProject<Projects.ThemePark_Weather_Api>("weather-api")
+var weatherApi = builder.AddProject<Projects.ThemePark_Weather_Api>(AspireConstants.Projects.WeatherApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-var mascotsApi = builder.AddProject<Projects.ThemePark_Mascots_Api>("mascots-api")
+var mascotsApi = builder.AddProject<Projects.ThemePark_Mascots_Api>(AspireConstants.Projects.MascotsApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-var refundsApi = builder.AddProject<Projects.ThemePark_Refunds_Api>("refunds-api")
+var refundsApi = builder.AddProject<Projects.ThemePark_Refunds_Api>(AspireConstants.Projects.RefundsApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 
 var gateway = builder.AddYarp("gateway")

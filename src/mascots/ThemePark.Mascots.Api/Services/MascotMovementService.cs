@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.State;
 using ThemePark.Mascots.Zones;
@@ -77,7 +78,7 @@ public sealed class MascotMovementService : IHostedService, IAsyncDisposable
                     DateTimeOffset.UtcNow);
 
                 await _daprClient.PublishEventAsync(
-                    "themepark-pubsub", "mascot.in-restricted-zone", evt, ct);
+                    AspireConstants.DaprComponents.PubSub, "mascot.in-restricted-zone", evt, ct);
             }
         }
     }

@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.State;
@@ -35,7 +36,7 @@ public sealed class SimulateIntrusionHandler(IMascotStateStore store, DaprClient
                 DateTimeOffset.UtcNow);
 
             await daprClient.PublishEventAsync(
-                "themepark-pubsub", "mascot.in-restricted-zone", evt, cancellationToken);
+                AspireConstants.DaprComponents.PubSub, "mascot.in-restricted-zone", evt, cancellationToken);
         }
 
         return OperationResult.Success();

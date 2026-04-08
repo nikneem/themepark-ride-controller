@@ -1,6 +1,7 @@
 using Dapr.Client;
 using Dapr.Workflow;
 using System.Net.Http.Json;
+using ThemePark.Aspire.ServiceDefaults;
 
 namespace ThemePark.ControlCenter.Workflow.Activities;
 
@@ -46,7 +47,7 @@ public sealed record IssueRefundActivityOutput(
 public sealed class IssueRefundActivity : WorkflowActivity<IssueRefundActivityInput, IssueRefundActivityOutput>
 {
     // CreateInvokeHttpClient routes HTTP requests through the Dapr sidecar to the named app.
-    private static readonly HttpClient HttpClient = DaprClient.CreateInvokeHttpClient("refunds-api");
+    private static readonly HttpClient HttpClient = DaprClient.CreateInvokeHttpClient(AspireConstants.Projects.RefundsApi);
 
     public override async Task<IssueRefundActivityOutput> RunAsync(
         WorkflowActivityContext context,

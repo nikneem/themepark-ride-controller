@@ -4,6 +4,7 @@
     <ProjectReference Include="..\..\ThemePark.Shared\ThemePark.Shared.csproj" />
     <ProjectReference Include="..\ThemePark.Rides.Abstractions\ThemePark.Rides.Abstractions.csproj" />
     <ProjectReference Include="..\..\Shared\ThemePark.EventContracts\ThemePark.EventContracts.csproj" />
+    <ProjectReference Include="..\..\Aspire\ThemePark.Aspire.ServiceDefaults\ThemePark.Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>

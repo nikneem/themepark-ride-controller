@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Microsoft.Extensions.Logging;
+using ThemePark.Aspire.ServiceDefaults;
 
 namespace ThemePark.ControlCenter.Features.GetRideHistory;
 
@@ -9,7 +10,7 @@ namespace ThemePark.ControlCenter.Features.GetRideHistory;
 /// </summary>
 public sealed class GetRideHistoryHandler(DaprClient daprClient, ILogger<GetRideHistoryHandler> logger)
 {
-    private const string StoreName = "themepark-statestore";
+    private const string StoreName = AspireConstants.DaprComponents.StateStore;
 
     public async Task<IReadOnlyList<RideHistoryEntry>> HandleAsync(
         GetRideHistoryQuery query,

@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.Maintenance.Models;
 using ThemePark.Maintenance.State;
 
@@ -10,7 +11,7 @@ namespace ThemePark.Maintenance.Data.Dapr;
 /// </summary>
 public sealed class DaprMaintenanceStateStore(DaprClient daprClient) : IMaintenanceStateStore
 {
-    private const string StoreName = "themepark-statestore";
+    private const string StoreName = AspireConstants.DaprComponents.StateStore;
     private const int HistoryCap = 20;
 
     private static string RecordKey(Guid maintenanceId) => $"maintenance-{maintenanceId}";

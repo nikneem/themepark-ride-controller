@@ -1,6 +1,7 @@
 using Dapr.Client;
 using Dapr.Workflow;
 using Microsoft.Extensions.Logging;
+using ThemePark.Aspire.ServiceDefaults;
 
 namespace ThemePark.ControlCenter.Features.ResolveChaosEvent;
 
@@ -13,7 +14,7 @@ public sealed class ResolveChaosEventHandler(
     DaprWorkflowClient workflowClient,
     ILogger<ResolveChaosEventHandler> logger)
 {
-    private const string StoreName = "themepark-statestore";
+    private const string StoreName = AspireConstants.DaprComponents.StateStore;
 
     /// <summary>
     /// Returns <c>true</c> when the event was raised successfully;

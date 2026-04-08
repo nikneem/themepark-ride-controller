@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Shared;
 using ThemePark.Shared.Enums;
@@ -76,7 +77,7 @@ public sealed class SimulateWeatherHandlerTests
         await handler.HandleAsync(new SimulateWeatherCommand("Mild", ["Zone-A", "Zone-B"]));
 
         dapr.Verify(d => d.PublishEventAsync(
-            "themepark-pubsub", "weather.alert",
+            AspireConstants.DaprComponents.PubSub, "weather.alert",
             It.Is<WeatherAlertEvent>(e => e.Severity == WeatherSeverity.Mild),
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -88,7 +89,7 @@ public sealed class SimulateWeatherHandlerTests
         await handler.HandleAsync(new SimulateWeatherCommand("Severe", ["Zone-C"]));
 
         dapr.Verify(d => d.PublishEventAsync(
-            "themepark-pubsub", "weather.alert",
+            AspireConstants.DaprComponents.PubSub, "weather.alert",
             It.Is<WeatherAlertEvent>(e => e.Severity == WeatherSeverity.Severe),
             It.IsAny<CancellationToken>()), Times.Once);
     }

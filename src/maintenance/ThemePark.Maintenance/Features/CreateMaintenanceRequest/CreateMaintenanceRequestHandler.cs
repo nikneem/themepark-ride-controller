@@ -1,5 +1,6 @@
 using Dapr.Client;
 using System.Diagnostics;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Maintenance.Abstractions.DataTransferObjects;
 using ThemePark.Maintenance.Models;
@@ -50,7 +51,7 @@ public sealed class CreateMaintenanceRequestHandler(
             reason.ToString(),
             record.RequestedAt);
 
-        await daprClient.PublishEventAsync("themepark-pubsub", "maintenance.requested", evt, cancellationToken);
+        await daprClient.PublishEventAsync(AspireConstants.DaprComponents.PubSub, "maintenance.requested", evt, cancellationToken);
 
         activity?.SetTag("maintenance.id", maintenanceId);
         activity?.SetTag("ride.id", command.RideId);

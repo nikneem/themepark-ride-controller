@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Microsoft.Extensions.Configuration;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared;
@@ -18,7 +19,7 @@ public sealed class SimulateMalfunctionHandler(
     IConfiguration configuration)
     : ICommandHandler<SimulateMalfunctionCommand, OperationResult>
 {
-    private const string PubSubName = "themepark-pubsub";
+    private const string PubSubName = AspireConstants.DaprComponents.PubSub;
     private const string TopicName = "ride.malfunction";
 
     public async Task<OperationResult> HandleAsync(

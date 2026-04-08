@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.Refunds.Models;
 using ThemePark.Refunds.State;
 
@@ -10,7 +11,7 @@ namespace ThemePark.Refunds.Data.Dapr;
 /// </summary>
 public sealed class DaprRefundStateStore(DaprClient daprClient) : IRefundStateStore
 {
-    private const string StoreName = "themepark-statestore";
+    private const string StoreName = AspireConstants.DaprComponents.StateStore;
 
     private static string BatchKey(Guid refundBatchId) => $"refund-batch-{refundBatchId}";
     private static string HistoryKey(Guid rideId) => $"refund-history-{rideId}";

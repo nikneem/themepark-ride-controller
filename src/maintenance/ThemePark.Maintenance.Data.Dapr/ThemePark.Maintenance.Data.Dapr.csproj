@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\ThemePark.Maintenance\ThemePark.Maintenance.csproj" />
+    <ProjectReference Include="..\..\Aspire\ThemePark.Aspire.ServiceDefaults\ThemePark.Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Dapr.AspNetCore" Version="1.17.7" />

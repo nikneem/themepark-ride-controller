@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Dapr;
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.ControlCenter.Domain;
 using ThemePark.ControlCenter.Features;
 using ThemePark.ControlCenter.Features.ApproveMaintenance;
@@ -205,7 +206,7 @@ app.MapGet("/api/events/stream", async (
 // ── Dapr subscribers — one endpoint per event contract ──────────────────────
 
 app.MapPost("/events/ride-status-changed",
-    [Topic("themepark-pubsub", "ride.status-changed", DeadLetterTopic = "ride.status-changed.deadletter")]
+    [Topic(AspireConstants.DaprComponents.PubSub, "ride.status-changed", DeadLetterTopic = "ride.status-changed.deadletter")]
     (RideStatusChangedEvent evt, SseConnectionManager sseManager, ILogger<Program> log) =>
     {
         log.LogInformation("Ride {RideId} status changed: {From} → {To}", evt.RideId, evt.PreviousStatus, evt.NewStatus);
@@ -215,7 +216,7 @@ app.MapPost("/events/ride-status-changed",
     });
 
 app.MapPost("/events/weather-alert",
-    [Topic("themepark-pubsub", "weather.alert", DeadLetterTopic = "weather.alert.deadletter")]
+    [Topic(AspireConstants.DaprComponents.PubSub, "weather.alert", DeadLetterTopic = "weather.alert.deadletter")]
     (WeatherAlertEvent evt, ILogger<Program> log) =>
     {
         // TODO: WeatherAlertEvent has no direct rideId — it targets zones (evt.AffectedZones).
@@ -230,11 +231,11 @@ app.MapPost("/events/weather-alert",
     });
 
 app.MapPost("/events/mascot-in-restricted-zone",
-    [Topic("themepark-pubsub", "mascot.in-restricted-zone", DeadLetterTopic = "mascot.in-restricted-zone.deadletter")]
+    [Topic(AspireConstants.DaprComponents.PubSub, "mascot.in-restricted-zone", DeadLetterTopic = "mascot.in-restricted-zone.deadletter")]
     async (MascotInRestrictedZoneEvent evt, DaprClient daprClient, DaprWorkflowClient workflowClient, ILogger<Program> log) =>
     {
         var rideId = evt.AffectedRideId.ToString();
-        var instanceId = await daprClient.GetStateAsync<string?>("themepark-statestore", $"active-workflow-{rideId}");
+        var instanceId = await daprClient.GetStateAsync<string?>(AspireConstants.DaprComponents.StateStore, $"active-workflow-{rideId}");
 
         if (string.IsNullOrEmpty(instanceId))
         {
@@ -248,11 +249,11 @@ app.MapPost("/events/mascot-in-restricted-zone",
     });
 
 app.MapPost("/events/ride-malfunction",
-    [Topic("themepark-pubsub", "ride.malfunction", DeadLetterTopic = "ride.malfunction.deadletter")]
+    [Topic(AspireConstants.DaprComponents.PubSub, "ride.malfunction", DeadLetterTopic = "ride.malfunction.deadletter")]
     async (RideMalfunctionEvent evt, DaprClient daprClient, DaprWorkflowClient workflowClient, ILogger<Program> log) =>
     {
         var rideId = evt.RideId.ToString();
-        var instanceId = await daprClient.GetStateAsync<string?>("themepark-statestore", $"active-workflow-{rideId}");
+        var instanceId = await daprClient.GetStateAsync<string?>(AspireConstants.DaprComponents.StateStore, $"active-workflow-{rideId}");
 
         if (string.IsNullOrEmpty(instanceId))
         {
@@ -266,7 +267,7 @@ app.MapPost("/events/ride-malfunction",
     });
 
 app.MapPost("/events/maintenance-requested",
-    [Topic("themepark-pubsub", "maintenance.requested", DeadLetterTopic = "maintenance.requested.deadletter")]
+    [Topic(AspireConstants.DaprComponents.PubSub, "maintenance.requested", DeadLetterTopic = "maintenance.requested.deadletter")]
     (MaintenanceRequestedEvent evt, ILogger<Program> log) =>
     {
         log.LogInformation("Maintenance requested for ride {RideId}: {MaintenanceId} — {Reason}", evt.RideId, evt.MaintenanceId, evt.Reason);
@@ -274,11 +275,11 @@ app.MapPost("/events/maintenance-requested",
     });
 
 app.MapPost("/events/maintenance-completed",
-    [Topic("themepark-pubsub", "maintenance.completed", DeadLetterTopic = "maintenance.completed.deadletter")]
+    [Topic(AspireConstants.DaprComponents.PubSub, "maintenance.completed", DeadLetterTopic = "maintenance.completed.deadletter")]
     async (MaintenanceCompletedEvent evt, DaprClient daprClient, DaprWorkflowClient workflowClient, ILogger<Program> log) =>
     {
         var rideId = evt.RideId.ToString();
-        var instanceId = await daprClient.GetStateAsync<string?>("themepark-statestore", $"active-workflow-{rideId}");
+        var instanceId = await daprClient.GetStateAsync<string?>(AspireConstants.DaprComponents.StateStore, $"active-workflow-{rideId}");
 
         if (string.IsNullOrEmpty(instanceId))
         {

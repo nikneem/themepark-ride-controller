@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Dapr.Workflow;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.ControlCenter.Workflow;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared;
@@ -17,7 +18,7 @@ public sealed class StartWorkflowHandler(
     DaprWorkflowClient workflowClient,
     DaprClient daprClient)
 {
-    private const string StoreName = "themepark-statestore";
+    private const string StoreName = AspireConstants.DaprComponents.StateStore;
 
     public async Task<OperationResult<StartWorkflowResponse>> HandleAsync(
         StartWorkflowCommand command,

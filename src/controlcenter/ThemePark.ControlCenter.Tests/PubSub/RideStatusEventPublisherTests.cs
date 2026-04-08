@@ -1,5 +1,6 @@
 using Dapr.Client;
 using NSubstitute;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.ControlCenter.PubSub;
 using ThemePark.EventContracts.Events;
 using ThemePark.Shared.Enums;
@@ -11,7 +12,7 @@ namespace ThemePark.ControlCenter.Tests.PubSub;
 /// </summary>
 public sealed class RideStatusEventPublisherTests
 {
-    private const string PubSubName = "themepark-pubsub";
+    private const string PubSubName = AspireConstants.DaprComponents.PubSub;
     private const string TopicName  = "ride.status-changed";
 
     [Fact]

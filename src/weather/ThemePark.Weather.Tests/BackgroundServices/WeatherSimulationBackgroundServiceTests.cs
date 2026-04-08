@@ -2,6 +2,7 @@ using Dapr.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Shared.Enums;
 using ThemePark.Weather.Api.BackgroundServices;
@@ -51,7 +52,7 @@ public sealed class WeatherSimulationBackgroundServiceTests
 
         var daprMock = new Mock<DaprClient>();
         daprMock.Setup(d => d.PublishEventAsync(
-            "themepark-pubsub", "weather.alert",
+            AspireConstants.DaprComponents.PubSub, "weather.alert",
             It.Is<WeatherAlertEvent>(e => e.Severity == WeatherSeverity.Mild && e.AffectedZones.Contains("Zone-A")),
             It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
@@ -60,7 +61,7 @@ public sealed class WeatherSimulationBackgroundServiceTests
         await service.TickAsync();
 
         daprMock.Verify(d => d.PublishEventAsync(
-            "themepark-pubsub", "weather.alert",
+            AspireConstants.DaprComponents.PubSub, "weather.alert",
             It.Is<WeatherAlertEvent>(e => e.Severity == WeatherSeverity.Mild),
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -83,7 +84,7 @@ public sealed class WeatherSimulationBackgroundServiceTests
         await service.TickAsync();
 
         daprMock.Verify(d => d.PublishEventAsync(
-            "themepark-pubsub", "weather.alert",
+            AspireConstants.DaprComponents.PubSub, "weather.alert",
             It.Is<WeatherAlertEvent>(e =>
                 e.Severity == WeatherSeverity.Severe &&
                 e.AffectedZones.Length == 2),

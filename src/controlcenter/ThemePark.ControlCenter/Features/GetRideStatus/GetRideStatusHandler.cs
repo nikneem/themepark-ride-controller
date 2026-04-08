@@ -1,6 +1,7 @@
 using Dapr;
 using Dapr.Client;
 using Microsoft.Extensions.Logging;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.ControlCenter.Features;
 using ThemePark.Rides.Abstractions.DataTransferObjects;
 
@@ -20,7 +21,7 @@ public sealed class GetRideStatusHandler(DaprClient daprClient, ILogger<GetRideS
         {
             var dto = await daprClient.InvokeMethodAsync<RideStateDto>(
                 HttpMethod.Get,
-                "rides-api",
+                AspireConstants.Projects.RidesApi,
                 $"/api/rides/{query.RideId}",
                 cancellationToken);
 

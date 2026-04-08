@@ -1,6 +1,7 @@
 using Dapr.Client;
 using Microsoft.Extensions.Configuration;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Api.Services;
 using ThemePark.Mascots.Data.InMemory;
@@ -92,7 +93,7 @@ public class MascotMovementServiceTests
         // mascot-003 → Backstage (safe) → no publish
         daprMock.Verify(
             d => d.PublishEventAsync(
-                "themepark-pubsub",
+                AspireConstants.DaprComponents.PubSub,
                 "mascot.in-restricted-zone",
                 It.IsAny<MascotInRestrictedZoneEvent>(),
                 It.IsAny<CancellationToken>()),

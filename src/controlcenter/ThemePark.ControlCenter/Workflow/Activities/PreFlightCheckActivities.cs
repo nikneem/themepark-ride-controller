@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Dapr.Workflow;
+using ThemePark.Aspire.ServiceDefaults;
 
 namespace ThemePark.ControlCenter.Workflow.Activities;
 
@@ -21,7 +22,7 @@ public sealed class CheckWeatherActivity(DaprClient daprClient)
         try
         {
             var response = await daprClient.InvokeMethodAsync<WeatherCheckResponse>(
-                HttpMethod.Get, "weather-api", "api/weather/current");
+                HttpMethod.Get, AspireConstants.Projects.WeatherApi, "api/weather/current");
             return new PreFlightCheckResult(response.IsSafe, response.IsSafe ? "Weather is safe" : "Weather conditions unsafe");
         }
         catch (Exception ex)
@@ -40,7 +41,7 @@ public sealed class CheckMascotZoneActivity(DaprClient daprClient)
         try
         {
             var response = await daprClient.InvokeMethodAsync<MascotZoneCheckResponse>(
-                HttpMethod.Get, "mascots-api", $"api/mascots/restricted-zone/{rideId}");
+                HttpMethod.Get, AspireConstants.Projects.MascotsApi, $"api/mascots/restricted-zone/{rideId}");
             return new PreFlightCheckResult(!response.MascotPresent,
                 response.MascotPresent ? "Mascot in restricted zone" : "Zone clear");
         }
@@ -60,7 +61,7 @@ public sealed class CheckMaintenanceStatusActivity(DaprClient daprClient)
         try
         {
             var response = await daprClient.InvokeMethodAsync<MaintenanceStatusResponse>(
-                HttpMethod.Get, "maintenance-api", $"api/maintenance/rides/{rideId}/status");
+                HttpMethod.Get, AspireConstants.Projects.MaintenanceApi, $"api/maintenance/rides/{rideId}/status");
             return new PreFlightCheckResult(response.IsOperational,
                 response.IsOperational ? "Ride operational" : "Ride under maintenance");
         }
@@ -80,7 +81,7 @@ public sealed class CheckSafetySystemsActivity(DaprClient daprClient)
         try
         {
             var response = await daprClient.InvokeMethodAsync<SafetyStatusResponse>(
-                HttpMethod.Get, "rides-api", $"api/rides/{rideId}/safety");
+                HttpMethod.Get, AspireConstants.Projects.RidesApi, $"api/rides/{rideId}/safety");
             return new PreFlightCheckResult(response.SafetySystemsOk,
                 response.SafetySystemsOk ? "Safety systems OK" : "Safety system fault detected");
         }

@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.Maintenance.Abstractions.DataTransferObjects;
 using ThemePark.Maintenance.Features.CompleteMaintenanceRequest;
 using ThemePark.Maintenance.Models;
@@ -76,7 +77,7 @@ public sealed class CompleteMaintenanceRequestHandlerTests
         Assert.NotNull(result.Value.DurationMinutes);
         _stateStore.Verify(s => s.SaveRecordAsync(It.IsAny<MaintenanceRecord>(), It.IsAny<CancellationToken>()), Times.Once);
         _daprClient.Verify(d => d.PublishEventAsync(
-            "themepark-pubsub", "maintenance.completed",
+            AspireConstants.DaprComponents.PubSub, "maintenance.completed",
             It.IsAny<ThemePark.EventContracts.Events.MaintenanceCompletedEvent>(),
             It.IsAny<CancellationToken>()), Times.Once);
     }

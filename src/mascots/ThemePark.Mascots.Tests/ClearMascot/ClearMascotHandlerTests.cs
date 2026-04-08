@@ -1,5 +1,6 @@
 using Dapr.Client;
 using Moq;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Mascots.Abstractions.DataTransferObjects;
 using ThemePark.Mascots.Data.InMemory;
@@ -59,7 +60,7 @@ public class ClearMascotHandlerTests
 
         dapr.Verify(
             d => d.PublishEventAsync(
-                "themepark-pubsub", "mascot.cleared",
+                AspireConstants.DaprComponents.PubSub, "mascot.cleared",
                 It.IsAny<MascotClearedEvent>(),
                 It.IsAny<CancellationToken>()),
             Times.Once);

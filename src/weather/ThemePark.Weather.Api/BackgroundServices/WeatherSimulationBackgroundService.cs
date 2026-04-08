@@ -1,4 +1,5 @@
 using Dapr.Client;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.EventContracts.Events;
 using ThemePark.Shared.Enums;
 using ThemePark.Weather.Api.Configuration;
@@ -56,7 +57,7 @@ public sealed class WeatherSimulationBackgroundService : BackgroundService
                 condition.AffectedZones,
                 condition.GeneratedAt);
 
-            await _daprClient.PublishEventAsync("themepark-pubsub", "weather.alert", evt, ct);
+            await _daprClient.PublishEventAsync(AspireConstants.DaprComponents.PubSub, "weather.alert", evt, ct);
         }
     }
 }
