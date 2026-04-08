@@ -173,6 +173,10 @@ app.MapGet("/api/events/stream", async (
     var (connectionId, reader) = sseManager.AddConnection();
     try
     {
+        // Flush headers immediately so the client sees the connection is open.
+        await response.WriteAsync(": connected\n\n", ct);
+        await response.Body.FlushAsync(ct);
+
         while (!ct.IsCancellationRequested)
         {
             using var heartbeatCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
