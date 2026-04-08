@@ -14,7 +14,7 @@
 
 - [x] 2.1 Reference `ThemePark.EventContracts` from all publisher and subscriber service projects
 - [x] 2.2 Register the `themepark-pubsub` Dapr pub/sub component in Aspire AppHost wired to the existing Redis resource
-- [ ] 2.3 Verify the component appears in the Aspire dashboard when running locally
+- [x] 2.3 Verify the component appears in the Aspire dashboard when running locally
 
 ## 3. Control Center API — Subscriber Endpoints
 
@@ -41,7 +41,7 @@
 
 ## 6. Integration Tests
 
-- [ ] 6.1 Write an xUnit integration test that publishes a `WeatherAlertEvent` to a test Dapr pub/sub component and asserts the Control Center subscriber endpoint is invoked with the correct deserialized payload
-- [ ] 6.2 Write an xUnit integration test for `maintenance.completed` that verifies the waiting workflow step is unblocked after the event is received
+- [x] 6.1 Write an xUnit integration test that publishes a `WeatherAlertEvent` to a test Dapr pub/sub component and asserts the Control Center subscriber endpoint is invoked with the correct deserialized payload
+- [x] 6.2 Write an xUnit integration test for `maintenance.completed` that verifies the waiting workflow step is unblocked after the event is received
 - [x] 6.3 Write a unit test for the `ThemePark.EventContracts` serialisation helper asserting camelCase property names and string enum values in the serialised JSON
 - [x] 6.4 Write a unit test asserting that a `WeatherAlertEvent` with severity `Calm` is never published by Weather Service

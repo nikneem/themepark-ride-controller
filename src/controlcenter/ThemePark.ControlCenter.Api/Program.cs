@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Channels;
 using Dapr;
 using ThemePark.ControlCenter.Infrastructure;
@@ -14,6 +15,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddDaprClient();
+
+// Align HTTP JSON serialization with EventContracts: camelCase properties + string enum values.
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+});
 
 // Dapr Workflow — registers RideWorkflow and all activities
 builder.Services.AddDaprWorkflow(options =>
@@ -121,3 +130,6 @@ app.MapPost("/events/maintenance-completed",
     });
 
 app.Run();
+
+// Make the implicit Program class visible for WebApplicationFactory-based integration tests.
+public partial class Program { }
