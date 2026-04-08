@@ -1,0 +1,102 @@
+@if (rideStatus(); as status) {
+  <app-page-header [title]="status.name" subtitle="Ride Detail & Controls" icon="🎢" />
+
+  <div class="detail-grid">
+    <div class="main-col">
+      <div class="info-card">
+        <h3>Status</h3>
+        <app-status-badge [status]="status.status" />
+        @if (status.workflowStep) {
+          <p class="workflow-step">Workflow: <strong>{{ status.workflowStep }}</strong></p>
+        }
+        <div class="action-buttons">
+          @if (status.status.toLowerCase() === 'idle') {
+            <p-button label="Start Ride" icon="pi pi-play" severity="success" (onClick)="startRide()" />
+          }
+          @if (status.status.toLowerCase() === 'maintenance') {
+            <p-button label="Approve Maintenance" icon="pi pi-check" severity="warn" (onClick)="approveMaintenance()" />
+          }
+        </div>
+      </div>
+
+      @if (status.activeChaosEvents.length > 0) {
+        <div class="chaos-card">
+          <h3>⚠️ Active Chaos Events</h3>
+          @for (event of status.activeChaosEvents; track event) {
+            <div class="chaos-event">
+              <span>{{ event }}</span>
+              <p-button label="Resolve" icon="pi pi-check" severity="danger" size="small" (onClick)="resolveEvent(event)" />
+            </div>
+          }
+        </div>
+      }
+
+      @if (queue(); as q) {
+        <div class="queue-card">
+          <h3>👥 Queue Status</h3>
+          <div class="queue-stats">
+            <div class="qstat"><strong>{{ q.waitingCount }}</strong><span>Waiting</span></div>
+            <div class="qstat"><strong>{{ q.estimatedWaitMinutes }} min</strong><span>Est. Wait</span></div>
+            <div class="qstat"><strong>{{ q.hasVip ? 'Yes' : 'No' }}</strong><span>VIP Queue</span></div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="history-col">
+      <div class="table-card">
+        <h3>📋 Ride History</h3>
+        <p-table [value]="history()" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Started</th>
+              <th>Outcome</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-h>
+            <tr>
+              <td>{{ h.startedAt | date:'short' }}</td>
+              <td>{{ h.outcome }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="table-card">
+        <h3>🔧 Maintenance History</h3>
+        <p-table [value]="maintenanceHistory()" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Reason</th>
+              <th>Status</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-m>
+            <tr>
+              <td>{{ m.reason }}</td>
+              <td>{{ m.status }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="table-card">
+        <h3>💰 Refund History</h3>
+        <p-table [value]="refundHistory()" styleClass="p-datatable-sm">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Reason</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-r>
+            <tr>
+              <td>{{ r.reason }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="loading-state">Loading ride details...</div>
+}

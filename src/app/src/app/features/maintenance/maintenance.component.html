@@ -1,0 +1,43 @@
+<app-page-header title="Maintenance" subtitle="Maintenance request management" icon="🔧" />
+
+<div class="create-card">
+  <h3>➕ New Maintenance Request</h3>
+  <div class="create-form">
+    <input pInputText [(ngModel)]="newRideId" placeholder="Ride ID" />
+    <input pInputText [(ngModel)]="newReason" placeholder="Reason for maintenance" />
+    <p-button label="Create Request" icon="pi pi-plus" (onClick)="createRequest()" />
+  </div>
+</div>
+
+<div class="history-card">
+  <h3>📋 Maintenance History</h3>
+  <p-table [value]="allHistory()" styleClass="p-datatable-striped">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Ride</th>
+        <th>Reason</th>
+        <th>Status</th>
+        <th>Requested</th>
+        <th>Duration</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-m>
+      <tr>
+        <td>{{ m.rideId }}</td>
+        <td>{{ m.reason }}</td>
+        <td><span class="status-chip status-{{ m.status.toLowerCase() }}">{{ m.status }}</span></td>
+        <td>{{ m.requestedAt | date:'short' }}</td>
+        <td>{{ m.durationMinutes != null ? m.durationMinutes + ' min' : '—' }}</td>
+        <td>
+          @if (m.status.toLowerCase() !== 'completed') {
+            <p-button label="Complete" icon="pi pi-check" severity="success" size="small" (onClick)="complete(m.maintenanceId)" />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="6" class="empty-state">No maintenance records found</td></tr>
+    </ng-template>
+  </p-table>
+</div>

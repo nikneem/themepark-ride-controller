@@ -1,0 +1,61 @@
+.queue-table-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  h3 { margin: 0 0 1rem; }
+}
+
+.count-badge {
+  background: #FF6B35;
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.vip-badge {
+  color: #FFD700;
+  font-weight: 700;
+}
+
+.no-vip { color: #ccc; }
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.action-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  h3 { margin: 0 0 1rem; }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.625rem;
+  align-items: center;
+
+  label { color: #555; font-weight: 500; font-size: 0.875rem; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+}
+
+.mt-2 { margin-top: 1rem; }

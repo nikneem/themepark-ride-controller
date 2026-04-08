@@ -1,0 +1,31 @@
+<app-page-header title="Weather" subtitle="Current conditions and simulation" icon="🌤" />
+
+@if (weather(); as w) {
+  <div class="weather-card severity-{{ w.severity.toLowerCase() }}">
+    <div class="weather-header">
+      <span class="weather-emoji">{{ getWeatherEmoji() }}</span>
+      <div>
+        <h2>{{ w.severity }}</h2>
+        <p class="generated">Updated: {{ w.generatedAt | date:'medium' }}</p>
+      </div>
+    </div>
+    @if (w.affectedZones.length > 0) {
+      <div class="zones-section">
+        <h3>Affected Zones</h3>
+        <div class="zone-chips">
+          @for (zone of w.affectedZones; track zone) {
+            <span class="zone-chip">{{ zone }}</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
+
+<div class="simulate-card">
+  <h3>🎮 Demo Mode – Simulate Weather</h3>
+  <div class="simulate-form">
+    <p-select [options]="severityOptions" [(ngModel)]="simulateSeverity" placeholder="Select severity" />
+    <p-button label="Simulate" icon="pi pi-bolt" (onClick)="simulate()" />
+  </div>
+</div>

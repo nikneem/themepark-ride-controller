@@ -1,0 +1,72 @@
+<app-page-header title="Dashboard" subtitle="Theme Park Control Overview" icon="🎢" />
+
+<div class="stats-grid">
+  <app-stat-card title="Total Rides" [value]="rides().length" icon="pi pi-star" color="#FF6B35" />
+  <app-stat-card title="Running" [value]="runningRides()" icon="pi pi-play" color="#4CAF50" />
+  <app-stat-card title="Idle" [value]="idleRides()" icon="pi pi-pause" color="#9E9E9E" />
+  <app-stat-card title="Mascot Alerts" [value]="alertCount()" icon="pi pi-exclamation-triangle" color="#F44336" />
+</div>
+
+<div class="dashboard-grid">
+  <div class="rides-section">
+    <h2 class="section-title">🎡 Ride Status</h2>
+    @if (loading()) {
+      <div class="loading-state">Loading rides...</div>
+    } @else {
+      <div class="rides-grid">
+        @for (ride of rides(); track ride.rideId) {
+          <div class="ride-card" [class]="'status-' + ride.status.toLowerCase()">
+            <div class="ride-name">{{ ride.name }}</div>
+            <app-status-badge [status]="ride.status" />
+            <div class="ride-actions">
+              <a [routerLink]="['/rides', ride.rideId]" class="detail-link">View Details</a>
+              @if (ride.status.toLowerCase() === 'idle') {
+                <button class="start-btn" (click)="startRide(ride.rideId)">▶ Start</button>
+              }
+            </div>
+          </div>
+        }
+        @empty {
+          <p class="empty-state">No rides found</p>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="side-panels">
+    <div class="weather-panel">
+      <h2 class="section-title">{{ getWeatherIcon() }} Weather</h2>
+      @if (weather(); as w) {
+        <div class="weather-info">
+          <div class="severity-badge severity-{{ w.severity.toLowerCase() }}">{{ w.severity }}</div>
+          <div class="zones">
+            @for (zone of w.affectedZones; track zone) {
+              <span class="zone-tag">{{ zone }}</span>
+            }
+            @empty {
+              <span class="zone-tag neutral">No affected zones</span>
+            }
+          </div>
+        </div>
+      } @else {
+        <p class="loading-state">Loading weather...</p>
+      }
+    </div>
+
+    <div class="alerts-panel">
+      <h2 class="section-title">🚨 Mascot Alerts</h2>
+      @if (restrictedMascots().length === 0) {
+        <div class="all-clear">✅ All mascots in safe zones</div>
+      } @else {
+        <ul class="alert-list">
+          @for (mascot of restrictedMascots(); track mascot.mascotId) {
+            <li class="alert-item">
+              <span class="mascot-name">{{ mascot.name }}</span>
+              <span class="alert-badge">⚠️ Restricted Zone</span>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+</div>

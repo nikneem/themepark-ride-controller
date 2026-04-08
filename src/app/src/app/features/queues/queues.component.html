@@ -1,0 +1,58 @@
+<app-page-header title="Queues" subtitle="Queue management per ride" icon="👥" />
+
+<div class="queue-table-card">
+  <h3>Current Queue Status</h3>
+  <p-table [value]="queueStates()" styleClass="p-datatable-striped">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Ride</th>
+        <th>Waiting</th>
+        <th>Est. Wait</th>
+        <th>VIP</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-q>
+      <tr>
+        <td><strong>{{ q.rideName || q.rideId }}</strong></td>
+        <td><span class="count-badge">{{ q.waitingCount }}</span></td>
+        <td>{{ q.estimatedWaitMinutes }} min</td>
+        <td>
+          @if (q.hasVip) {
+            <span class="vip-badge">⭐ VIP</span>
+          } @else {
+            <span class="no-vip">—</span>
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="4" class="empty-state">No queue data</td></tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<div class="actions-grid">
+  <div class="action-card">
+    <h3>🎮 Simulate Queue</h3>
+    <div class="form-grid">
+      <label>Ride ID</label>
+      <input pInputText [(ngModel)]="simulateRideId" placeholder="Ride ID" />
+      <label>Count</label>
+      <p-inputnumber [(ngModel)]="simulateCount" [min]="1" [max]="100" />
+      <label>VIP Probability</label>
+      <p-inputnumber [(ngModel)]="simulateVipProb" [min]="0" [max]="1" [step]="0.1" />
+    </div>
+    <p-button label="Simulate" icon="pi pi-bolt" (onClick)="simulateQueue()" styleClass="mt-2" />
+  </div>
+
+  <div class="action-card">
+    <h3>🚀 Load Passengers</h3>
+    <div class="form-grid">
+      <label>Ride ID</label>
+      <input pInputText [(ngModel)]="loadRideId" placeholder="Ride ID" />
+      <label>Capacity</label>
+      <p-inputnumber [(ngModel)]="loadCapacity" [min]="1" [max]="100" />
+    </div>
+    <p-button label="Load" icon="pi pi-users" severity="success" (onClick)="loadPassengers()" styleClass="mt-2" />
+  </div>
+</div>

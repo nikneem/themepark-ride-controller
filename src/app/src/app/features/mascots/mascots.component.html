@@ -1,0 +1,36 @@
+<app-page-header title="Mascots" subtitle="Track and manage park mascots" icon="🎭" />
+
+<div class="mascots-grid">
+  @for (mascot of mascots(); track mascot.mascotId) {
+    <div class="mascot-card" [class.restricted]="mascot.isInRestrictedZone">
+      <div class="mascot-header">
+        <span class="mascot-icon">🎭</span>
+        <div>
+          <h3>{{ mascot.name }}</h3>
+          <span class="zone-info">📍 {{ mascot.currentZone }}</span>
+        </div>
+        @if (mascot.isInRestrictedZone) {
+          <span class="restricted-badge">⚠️ RESTRICTED</span>
+        }
+      </div>
+      @if (mascot.affectedRideId) {
+        <p class="affected-ride">Affecting ride: <strong>{{ mascot.affectedRideId }}</strong></p>
+      }
+      @if (mascot.isInRestrictedZone) {
+        <p-button label="Clear Mascot" icon="pi pi-times" severity="danger" size="small" (onClick)="clearMascot(mascot.mascotId)" />
+      }
+    </div>
+  }
+  @empty {
+    <p class="empty-state">No mascots found</p>
+  }
+</div>
+
+<div class="simulate-card">
+  <h3>🎮 Demo Mode – Simulate Intrusion</h3>
+  <div class="simulate-form">
+    <input pInputText [(ngModel)]="intrusionMascotId" placeholder="Mascot ID" />
+    <input pInputText [(ngModel)]="intrusionRideId" placeholder="Target Ride ID" />
+    <p-button label="Simulate" icon="pi pi-bolt" (onClick)="simulateIntrusion()" />
+  </div>
+</div>

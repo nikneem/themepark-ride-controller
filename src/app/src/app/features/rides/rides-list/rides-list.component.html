@@ -1,0 +1,30 @@
+<app-page-header title="Rides" subtitle="Manage all park rides" icon="🎡" />
+
+<div class="rides-container">
+  <p-table [value]="rides()" [loading]="loading()" styleClass="p-datatable-striped">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-ride>
+      <tr>
+        <td><strong>{{ ride.name }}</strong></td>
+        <td><app-status-badge [status]="ride.status" /></td>
+        <td class="actions">
+          <a [routerLink]="['/rides', ride.rideId]">
+            <p-button label="Details" icon="pi pi-eye" severity="info" size="small" />
+          </a>
+          @if (ride.status.toLowerCase() === 'idle') {
+            <p-button label="Start" icon="pi pi-play" severity="success" size="small" (onClick)="startRide(ride.rideId)" />
+          }
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr><td colspan="3" class="empty-state">No rides found</td></tr>
+    </ng-template>
+  </p-table>
+</div>

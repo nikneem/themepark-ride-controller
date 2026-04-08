@@ -1,0 +1,77 @@
+.mascots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.mascot-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 2px solid transparent;
+  transition: all 0.2s;
+
+  &.restricted {
+    border-color: #F44336;
+    background: #fff5f5;
+    animation: pulse-red 2s infinite;
+  }
+
+  .mascot-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+
+    .mascot-icon { font-size: 2rem; }
+
+    h3 { margin: 0; font-size: 1.1rem; font-weight: 700; color: #1a1a2e; }
+    .zone-info { font-size: 0.85rem; color: #666; }
+    .restricted-badge {
+      margin-left: auto;
+      background: #F44336;
+      color: white;
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+  }
+
+  .affected-ride {
+    font-size: 0.875rem;
+    color: #555;
+    margin: 0 0 0.75rem;
+  }
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(244, 67, 54, 0); }
+}
+
+.simulate-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  h3 { margin: 0 0 1rem; }
+
+  .simulate-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}
+
+.empty-state {
+  color: #999;
+  font-style: italic;
+  padding: 2rem;
+  text-align: center;
+  grid-column: 1/-1;
+}

@@ -1,0 +1,36 @@
+.create-card, .history-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  h3 { margin: 0 0 1rem; }
+}
+
+.create-form {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+
+  input { min-width: 200px; }
+}
+
+.status-chip {
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+
+  &.status-pending { background: #fff8e1; color: #e65100; }
+  &.status-inprogress { background: #e3f2fd; color: #1565c0; }
+  &.status-completed { background: #e8f5e9; color: #2e7d32; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+}

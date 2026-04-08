@@ -1,0 +1,16 @@
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <span class="logo-emoji">🎢</span>
+    <span class="logo-text">RideControl</span>
+  </div>
+  <ul class="nav-list">
+    @for (item of navItems; track item.route) {
+      <li>
+        <a [routerLink]="item.route" routerLinkActive="active" class="nav-item">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+</nav>

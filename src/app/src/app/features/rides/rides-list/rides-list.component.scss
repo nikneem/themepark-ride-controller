@@ -1,0 +1,20 @@
+.rides-container {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  a { text-decoration: none; }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #999;
+}

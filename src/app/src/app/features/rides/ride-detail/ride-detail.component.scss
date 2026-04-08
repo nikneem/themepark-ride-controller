@@ -1,0 +1,69 @@
+.detail-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.5rem;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.info-card, .chaos-card, .queue-card, .table-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+  h3 { margin: 0 0 1rem; color: #1a1a2e; }
+}
+
+.workflow-step {
+  margin: 0.75rem 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.action-buttons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.chaos-event {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.queue-stats {
+  display: flex;
+  gap: 1.5rem;
+
+  .qstat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    strong {
+      font-size: 1.5rem;
+      color: #FF6B35;
+      font-weight: 700;
+    }
+
+    span {
+      font-size: 0.8rem;
+      color: #666;
+      text-transform: uppercase;
+    }
+  }
+}
+
+.loading-state {
+  color: #999;
+  padding: 2rem;
+  text-align: center;
+}
