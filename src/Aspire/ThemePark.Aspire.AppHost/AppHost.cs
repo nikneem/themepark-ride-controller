@@ -37,28 +37,19 @@ var stateStore = builder.AddDaprComponent(AspireConstants.DaprComponents.StateSt
 
 // Helper to attach a Dapr sidecar referencing the shared pub/sub component.
 
-// Explicit HTTP endpoints ensure YARP (running in Docker) routes to HTTP, not HTTPS.
-// Ports match the "http" profile in each service's launchSettings.json.
 var controlCenterApi = builder.AddProject<Projects.ThemePark_ControlCenter_Api>(AspireConstants.Projects.ControlCenterApi)
-    .WithHttpEndpoint(port: 5288, name: "http")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var ridesApi = builder.AddProject<Projects.ThemePark_Rides_Api>(AspireConstants.Projects.RidesApi)
-    .WithHttpEndpoint(port: 5070, name: "http")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var queueApi = builder.AddProject<Projects.ThemePark_Queue_Api>(AspireConstants.Projects.QueueApi)
-    .WithHttpEndpoint(port: 5102, name: "http")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var maintenanceApi = builder.AddProject<Projects.ThemePark_Maintenance_Api>(AspireConstants.Projects.MaintenanceApi)
-    .WithHttpEndpoint(port: 5103, name: "http")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 var weatherApi = builder.AddProject<Projects.ThemePark_Weather_Api>(AspireConstants.Projects.WeatherApi)
-    .WithHttpEndpoint(port: 5104, name: "http")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
 var mascotsApi = builder.AddProject<Projects.ThemePark_Mascots_Api>(AspireConstants.Projects.MascotsApi)
-    .WithHttpEndpoint(port: 5105, name: "http")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
 var refundsApi = builder.AddProject<Projects.ThemePark_Refunds_Api>(AspireConstants.Projects.RefundsApi)
-    .WithHttpEndpoint(port: 5106, name: "http")
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 
 var gateway = builder.AddYarp("gateway")
