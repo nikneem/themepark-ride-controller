@@ -1,4 +1,7 @@
+using Dapr.Client;
 using Dapr.Workflow;
+using System.Net.Http.Json;
+using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.ControlCenter.PubSub;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Rides.StateMachine;
@@ -6,8 +9,63 @@ using ThemePark.Shared.Enums;
 
 namespace ThemePark.ControlCenter.Workflow.Activities;
 
+// Local DTOs for rides-service requests.
+internal sealed record PauseRideRequest(string? Reason);
+
 /// <summary>
-/// Shared base helper for ride transition activities.
+/// Pauses the ride by calling <c>POST /rides/{rideId}/pause</c> on rides-service via Dapr.
+/// </summary>
+public sealed class PauseRideActivity : WorkflowActivity<PauseRideActivityInput, bool>
+{
+    private static readonly HttpClient HttpClient =
+        DaprClient.CreateInvokeHttpClient(AspireConstants.Projects.RidesApi);
+
+    public override async Task<bool> RunAsync(WorkflowActivityContext context, PauseRideActivityInput input)
+    {
+        var request = new PauseRideRequest(input.Reason);
+        var httpResponse = await HttpClient.PostAsJsonAsync($"/rides/{input.RideId}/pause", request);
+        httpResponse.EnsureSuccessStatusCode();
+        return true;
+    }
+}
+
+/// <summary>
+/// Resumes the ride by calling <c>POST /rides/{rideId}/resume</c> on rides-service via Dapr.
+/// </summary>
+public sealed class ResumeRideActivity : WorkflowActivity<string, bool>
+{
+    private static readonly HttpClient HttpClient =
+        DaprClient.CreateInvokeHttpClient(AspireConstants.Projects.RidesApi);
+
+    public override async Task<bool> RunAsync(WorkflowActivityContext context, string rideId)
+    {
+        var httpResponse = await HttpClient.PostAsync($"/rides/{rideId}/resume", null);
+        httpResponse.EnsureSuccessStatusCode();
+        return true;
+    }
+}
+
+/// <summary>
+/// Stops/completes the ride by calling <c>POST /rides/{rideId}/stop</c> on rides-service via Dapr.
+/// Used for both successful completion and failure termination.
+/// </summary>
+public sealed class CompleteRideActivity : WorkflowActivity<string, bool>
+{
+    private static readonly HttpClient HttpClient =
+        DaprClient.CreateInvokeHttpClient(AspireConstants.Projects.RidesApi);
+
+    public override async Task<bool> RunAsync(WorkflowActivityContext context, string rideId)
+    {
+        var httpResponse = await HttpClient.PostAsync($"/rides/{rideId}/stop", null);
+        httpResponse.EnsureSuccessStatusCode();
+        return true;
+    }
+}
+
+// Legacy state-machine activities — kept for backward compatibility, not used by updated RideWorkflow.
+
+/// <summary>
+/// Shared base helper for legacy ride transition activities.
 /// Reads state, applies the machine transition, persists the result, and publishes the status-changed event.
 /// </summary>
 internal static class RideTransitionHelper
@@ -60,22 +118,6 @@ public sealed class StartRunActivity(IRideStateRepository repository, IRideStatu
         RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Running, repository, publisher, nameof(StartRunActivity));
 }
 
-/// <summary>Transitions a ride from Running → Paused.</summary>
-public sealed class PauseRideActivity(IRideStateRepository repository, IRideStatusEventPublisher publisher)
-    : WorkflowActivity<RideTransitionInput, RideTransitionOutput>
-{
-    public override Task<RideTransitionOutput> RunAsync(WorkflowActivityContext context, RideTransitionInput input) =>
-        RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Paused, repository, publisher, nameof(PauseRideActivity));
-}
-
-/// <summary>Transitions a ride from Paused|Resuming → Running.</summary>
-public sealed class ResumeRideActivity(IRideStateRepository repository, IRideStatusEventPublisher publisher)
-    : WorkflowActivity<RideTransitionInput, RideTransitionOutput>
-{
-    public override Task<RideTransitionOutput> RunAsync(WorkflowActivityContext context, RideTransitionInput input) =>
-        RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Running, repository, publisher, nameof(ResumeRideActivity));
-}
-
 /// <summary>Transitions a ride from Running → Maintenance.</summary>
 public sealed class EnterMaintenanceActivity(IRideStateRepository repository, IRideStatusEventPublisher publisher)
     : WorkflowActivity<RideTransitionInput, RideTransitionOutput>
@@ -90,14 +132,6 @@ public sealed class StartResumingActivity(IRideStateRepository repository, IRide
 {
     public override Task<RideTransitionOutput> RunAsync(WorkflowActivityContext context, RideTransitionInput input) =>
         RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Resuming, repository, publisher, nameof(StartResumingActivity));
-}
-
-/// <summary>Transitions a ride to Completed (from Running).</summary>
-public sealed class CompleteRideActivity(IRideStateRepository repository, IRideStatusEventPublisher publisher)
-    : WorkflowActivity<RideTransitionInput, RideTransitionOutput>
-{
-    public override Task<RideTransitionOutput> RunAsync(WorkflowActivityContext context, RideTransitionInput input) =>
-        RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Completed, repository, publisher, nameof(CompleteRideActivity));
 }
 
 /// <summary>Transitions a ride to Failed (from any valid state).</summary>
@@ -115,4 +149,3 @@ public sealed class ResetRideActivity(IRideStateRepository repository, IRideStat
     public override Task<RideTransitionOutput> RunAsync(WorkflowActivityContext context, RideTransitionInput input) =>
         RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Idle, repository, publisher, nameof(ResetRideActivity));
 }
-

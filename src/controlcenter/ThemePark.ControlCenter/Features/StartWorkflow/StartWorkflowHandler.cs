@@ -35,8 +35,9 @@ public sealed class StartWorkflowHandler(
 
         var input = new RideWorkflowInput(
             command.RideId,
-            command.Passengers,
-            command.RefundReason);
+            workflowId,
+            DateTimeOffset.UtcNow,
+            command.RideDurationSeconds);
 
         await workflowClient.ScheduleNewWorkflowAsync(
             nameof(RideWorkflow),

@@ -5,140 +5,170 @@ using ThemePark.Shared.Enums;
 namespace ThemePark.ControlCenter.Workflow;
 
 /// <summary>
-/// Orchestrates a full ride session lifecycle:
-/// 1. Parallel pre-flight checks (fan-out)
-/// 2. Riding phase with external chaos event handling (pause/resume loops)
-/// 3. Post-ride recording and state-store cleanup
-/// 4. Compensation on any failure (stop ride, issue refunds, cleanup)
+/// Orchestrates the full ride session lifecycle:
+/// 1. Pre-flight: status check → parallel weather + mascot → load passengers → start ride
+/// 2. Riding loop: duration timer OR chaos events (weather/mascot/malfunction)
+/// 3. Post-ride: complete → record session → cleanup
+/// 4. Compensation on any failure: stop ride → refund passengers → cleanup
 /// </summary>
 public sealed class RideWorkflow : Workflow<RideWorkflowInput, RideWorkflowOutput>
 {
+    private static readonly WorkflowTaskOptions ActivityOptions = new()
+    {
+        RetryPolicy = new WorkflowRetryPolicy(
+            maxNumberOfAttempts: 3,
+            firstRetryInterval: TimeSpan.FromSeconds(2),
+            backoffCoefficient: 2.0,
+            maxRetryInterval: TimeSpan.FromSeconds(8),
+            retryTimeout: TimeSpan.FromSeconds(30))
+    };
+
     public override async Task<RideWorkflowOutput> RunAsync(
         WorkflowContext context,
         RideWorkflowInput input)
     {
-        var startedAt = context.CurrentUtcDateTime;
-        var rideInput = new RideTransitionInput(input.RideId, RideStatus.PreFlight);
+        var startedAt = input.StartedAt;
+        var rideId = input.RideId;
+        var rideStarted = false;
+        IReadOnlyList<RidePassenger> passengers = [];
 
-        // ── 1. Pre-flight fan-out ─────────────────────────────────────────────
-        var weatherCheck = context.CallActivityAsync<PreFlightCheckResult>(nameof(CheckWeatherActivity), input.RideId);
-        var mascotCheck = context.CallActivityAsync<PreFlightCheckResult>(nameof(CheckMascotZoneActivity), input.RideId);
-        var maintenanceCheck = context.CallActivityAsync<PreFlightCheckResult>(nameof(CheckMaintenanceStatusActivity), input.RideId);
-        var safetyCheck = context.CallActivityAsync<PreFlightCheckResult>(nameof(CheckSafetySystemsActivity), input.RideId);
-
-        var checks = await Task.WhenAll(weatherCheck, mascotCheck, maintenanceCheck, safetyCheck);
-
-        if (checks.Any(c => !c.IsHealthy))
+        try
         {
-            return await CompensateAsync(context, input, rideInput,
-                "AbortedDueToPreFlightFailure", startedAt);
-        }
+            // ── 1. Pre-flight sequence ────────────────────────────────────────────
+            await context.CallActivityAsync<bool>(
+                nameof(CheckRideStatusActivity), rideId, ActivityOptions);
 
-        // ── 2. State transitions: PreFlight → Loading → Running ───────────────
-        await context.CallActivityAsync<RideTransitionOutput>(nameof(StartPreFlightActivity), rideInput);
-        await context.CallActivityAsync<RideTransitionOutput>(nameof(StartLoadingActivity), rideInput with { TargetStatus = RideStatus.Loading });
-        await context.CallActivityAsync<RideTransitionOutput>(nameof(StartRideActivity), rideInput with { TargetStatus = RideStatus.Running });
+            await Task.WhenAll(
+                context.CallActivityAsync<bool>(nameof(CheckWeatherActivity), rideId, ActivityOptions),
+                context.CallActivityAsync<bool>(nameof(CheckMascotActivity), rideId, ActivityOptions));
 
-        // ── 3. Riding loop — handle external chaos events ─────────────────────
-        string outcome;
-        while (true)
-        {
-            var rideEndedTask = context.WaitForExternalEventAsync<string>("ride-session-ended");
-            var weatherTask = context.WaitForExternalEventAsync<string>("WeatherAlertReceived");
-            var mascotTask = context.WaitForExternalEventAsync<string>("MascotIntrusionReceived");
-            var malfunctionTask = context.WaitForExternalEventAsync<string>("MalfunctionReceived");
-            var timeoutTask = context.CreateTimer(TimeSpan.FromHours(2));
+            var loadResult = await context.CallActivityAsync<LoadPassengersResult>(
+                nameof(LoadPassengersActivity), rideId, ActivityOptions);
+            passengers = loadResult.Passengers;
 
-            var winner = await Task.WhenAny(rideEndedTask, weatherTask, mascotTask, malfunctionTask, timeoutTask);
+            await context.CallActivityAsync<bool>(nameof(StartRideActivity), rideId, ActivityOptions);
+            rideStarted = true;
 
-            if (winner == rideEndedTask)
+            // ── 2. Riding loop ────────────────────────────────────────────────────
+            var rideDuration = TimeSpan.FromSeconds(input.RideDurationSeconds);
+            string outcome;
+
+            while (true)
             {
-                var result = await rideEndedTask;
-                if (result == "completed")
+                var timerTask = context.CreateTimer(rideDuration);
+                var weatherTask = context.WaitForExternalEventAsync<string>("WeatherAlertReceived");
+                var mascotTask = context.WaitForExternalEventAsync<string>("MascotIntrusionReceived");
+                var malfunctionTask = context.WaitForExternalEventAsync<string>("MalfunctionReceived");
+
+                var winner = await Task.WhenAny(timerTask, weatherTask, mascotTask, malfunctionTask);
+
+                if (winner == timerTask)
                 {
                     outcome = "Completed";
                     break;
                 }
-                return await CompensateAsync(context, input, rideInput, "AbortedDueToRideFailure", startedAt);
+
+                if (winner == weatherTask)
+                {
+                    var severity = await weatherTask;
+
+                    if (string.Equals(severity, WeatherSeverity.Severe.ToString(), StringComparison.OrdinalIgnoreCase))
+                        return await CompensateAsync(context, input, rideStarted, passengers,
+                            "AbortedDueToSevereWeather", startedAt);
+
+                    // Mild weather — pause and wait up to 10 min for resolution.
+                    await context.CallActivityAsync<bool>(nameof(PauseRideActivity),
+                        new PauseRideActivityInput(rideId, $"Weather alert: {severity}"), ActivityOptions);
+
+                    var resolvedTask = context.WaitForExternalEventAsync<string>("ChaosEventResolved");
+                    var weatherTimeout = context.CreateTimer(TimeSpan.FromMinutes(10));
+                    if (await Task.WhenAny(resolvedTask, weatherTimeout) == weatherTimeout)
+                        return await CompensateAsync(context, input, rideStarted, passengers,
+                            "AbortedDueToWeatherTimeout", startedAt);
+
+                    await context.CallActivityAsync<bool>(nameof(ResumeRideActivity), rideId, ActivityOptions);
+                    continue;
+                }
+
+                if (winner == mascotTask)
+                {
+                    await context.CallActivityAsync<bool>(nameof(PauseRideActivity),
+                        new PauseRideActivityInput(rideId, "Mascot intrusion detected"), ActivityOptions);
+
+                    var resolvedTask = context.WaitForExternalEventAsync<string>("ChaosEventResolved");
+                    var mascotTimeout = context.CreateTimer(TimeSpan.FromMinutes(5));
+                    // Auto-resume on timeout — mascot clears on its own.
+                    await Task.WhenAny(resolvedTask, mascotTimeout);
+
+                    await context.CallActivityAsync<bool>(nameof(ResumeRideActivity), rideId, ActivityOptions);
+                    continue;
+                }
+
+                if (winner == malfunctionTask)
+                {
+                    await context.CallActivityAsync<bool>(nameof(PauseRideActivity),
+                        new PauseRideActivityInput(rideId, "Malfunction reported"), ActivityOptions);
+
+                    await context.CallActivityAsync<bool>(nameof(TriggerMaintenanceActivity),
+                        new TriggerMaintenanceActivityInput(
+                            Guid.Parse(rideId), input.WorkflowId, "Malfunction during ride"),
+                        ActivityOptions);
+
+                    var approvedTask = context.WaitForExternalEventAsync<string>("MaintenanceApproved");
+                    var maintenanceTimeout = context.CreateTimer(TimeSpan.FromMinutes(30));
+                    if (await Task.WhenAny(approvedTask, maintenanceTimeout) == maintenanceTimeout)
+                        return await CompensateAsync(context, input, rideStarted, passengers,
+                            "AbortedDueToMaintenanceTimeout", startedAt);
+
+                    // Operator signals completion via ChaosEventResolved.
+                    await context.WaitForExternalEventAsync<string>("ChaosEventResolved");
+
+                    await context.CallActivityAsync<bool>(nameof(ResumeRideActivity), rideId, ActivityOptions);
+                    continue;
+                }
             }
 
-            if (winner == weatherTask)
-            {
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(PauseRideActivity), rideInput with { TargetStatus = RideStatus.Paused });
+            // ── 3. Post-ride ──────────────────────────────────────────────────────
+            await context.CallActivityAsync<bool>(nameof(CompleteRideActivity), rideId, ActivityOptions);
 
-                var clearedTask = context.WaitForExternalEventAsync<string>("WeatherCleared");
-                var weatherTimeout = context.CreateTimer(TimeSpan.FromMinutes(10));
-                if (await Task.WhenAny(clearedTask, weatherTimeout) == weatherTimeout)
-                    return await CompensateAsync(context, input, rideInput, "AbortedDueToWeather", startedAt);
+            var sessionId = context.NewGuid();
+            await context.CallActivityAsync<bool>(nameof(RecordSessionSummaryActivity),
+                new RecordSessionSummaryInput(
+                    sessionId, Guid.Parse(rideId), startedAt, context.CurrentUtcDateTime, outcome));
 
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(StartResumingActivity), rideInput with { TargetStatus = RideStatus.Resuming });
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(ResumeRideActivity), rideInput with { TargetStatus = RideStatus.Running });
-                continue;
-            }
+            await context.CallActivityAsync<bool>(nameof(CleanupWorkflowActivity), rideId);
 
-            if (winner == mascotTask)
-            {
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(PauseRideActivity), rideInput with { TargetStatus = RideStatus.Paused });
-
-                var clearedTask = context.WaitForExternalEventAsync<string>("MascotCleared");
-                var mascotTimeout = context.CreateTimer(TimeSpan.FromMinutes(5));
-                if (await Task.WhenAny(clearedTask, mascotTimeout) == mascotTimeout)
-                    return await CompensateAsync(context, input, rideInput, "AbortedDueTOMascot", startedAt);
-
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(StartResumingActivity), rideInput with { TargetStatus = RideStatus.Resuming });
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(ResumeRideActivity), rideInput with { TargetStatus = RideStatus.Running });
-                continue;
-            }
-
-            if (winner == malfunctionTask)
-            {
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(PauseRideActivity), rideInput with { TargetStatus = RideStatus.Paused });
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(EnterMaintenanceActivity), rideInput with { TargetStatus = RideStatus.Maintenance });
-
-                var approvedTask = context.WaitForExternalEventAsync<string>("MaintenanceApproved");
-                var maintenanceTimeout = context.CreateTimer(TimeSpan.FromMinutes(30));
-                if (await Task.WhenAny(approvedTask, maintenanceTimeout) == maintenanceTimeout)
-                    return await CompensateAsync(context, input, rideInput, "AbortedDueToMaintenance", startedAt);
-
-                // Wait for maintenance completion (no timeout — operator drives this).
-                await context.WaitForExternalEventAsync<string>("MaintenanceCompleted");
-
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(StartResumingActivity), rideInput with { TargetStatus = RideStatus.Resuming });
-                await context.CallActivityAsync<RideTransitionOutput>(nameof(ResumeRideActivity), rideInput with { TargetStatus = RideStatus.Running });
-                continue;
-            }
-
-            // 2-hour overall timeout.
-            return await CompensateAsync(context, input, rideInput, "AbortedDueToTimeout", startedAt);
+            return new RideWorkflowOutput(rideId, RideStatus.Completed, outcome);
         }
-
-        // ── 4. Post-ride: complete transition + record session ─────────────────
-        await context.CallActivityAsync<RideTransitionOutput>(nameof(CompleteRideActivity), rideInput with { TargetStatus = RideStatus.Completed });
-
-        var sessionId = context.NewGuid();
-        await context.CallActivityAsync<bool>(nameof(RecordSessionSummaryActivity),
-            new RecordSessionSummaryInput(sessionId, Guid.Parse(input.RideId), startedAt, context.CurrentUtcDateTime, outcome));
-
-        await context.CallActivityAsync<bool>(nameof(CleanupWorkflowActivity), input.RideId);
-
-        return new RideWorkflowOutput(input.RideId, RideStatus.Completed, outcome);
+        catch (Exception ex)
+        {
+            return await CompensateAsync(context, input, rideStarted, passengers,
+                $"AbortedDueToError: {ex.Message}", startedAt);
+        }
     }
 
     private static async Task<RideWorkflowOutput> CompensateAsync(
         WorkflowContext context,
         RideWorkflowInput input,
-        RideTransitionInput rideInput,
+        bool rideStarted,
+        IReadOnlyList<RidePassenger> passengers,
         string outcome,
         DateTimeOffset startedAt)
     {
-        await context.CallActivityAsync<RideTransitionOutput>(
-            nameof(FailRideActivity), rideInput with { TargetStatus = RideStatus.Failed });
+        if (rideStarted)
+        {
+            try
+            {
+                await context.CallActivityAsync<bool>(nameof(CompleteRideActivity), input.RideId);
+            }
+            catch { /* best effort */ }
+        }
 
         Guid? refundBatchId = null;
-        if (input.Passengers.Count > 0)
+        if (passengers.Count > 0)
         {
             var refundInput = new IssueRefundActivityInput(
-                input.RideId, context.InstanceId, outcome, input.Passengers);
+                input.RideId, input.WorkflowId, outcome, passengers);
             var refundOutput = await context.CallActivityAsync<IssueRefundActivityOutput>(
                 nameof(IssueRefundActivity), refundInput);
             refundBatchId = refundOutput.RefundBatchId;
@@ -148,7 +178,8 @@ public sealed class RideWorkflow : Workflow<RideWorkflowInput, RideWorkflowOutpu
 
         var sessionId = context.NewGuid();
         await context.CallActivityAsync<bool>(nameof(RecordSessionSummaryActivity),
-            new RecordSessionSummaryInput(sessionId, Guid.Parse(input.RideId), startedAt, context.CurrentUtcDateTime, outcome));
+            new RecordSessionSummaryInput(
+                sessionId, Guid.Parse(input.RideId), startedAt, context.CurrentUtcDateTime, outcome));
 
         return new RideWorkflowOutput(input.RideId, RideStatus.Failed, outcome, refundBatchId);
     }

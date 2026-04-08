@@ -1,10 +1,8 @@
 using Dapr.Client;
 using Dapr.Workflow;
+using System.Net.Http.Json;
 using ThemePark.Aspire.ServiceDefaults;
 using ThemePark.ControlCenter.Domain;
-using ThemePark.Rides.Infrastructure;
-using ThemePark.ControlCenter.PubSub;
-using ThemePark.Shared.Enums;
 
 namespace ThemePark.ControlCenter.Workflow.Activities;
 
@@ -17,24 +15,19 @@ public sealed record RecordSessionSummaryInput(
     string Outcome);
 
 /// <summary>
-/// Transitions the ride to Running — used as the activity that "starts" the ride
-/// after all pre-flight checks have passed.
+/// Starts the ride by calling <c>POST /rides/{rideId}/start</c> on rides-service via Dapr.
 /// </summary>
-public sealed class StartRideActivity(IRideStateRepository repository, IRideStatusEventPublisher publisher)
-    : WorkflowActivity<RideTransitionInput, RideTransitionOutput>
+public sealed class StartRideActivity : WorkflowActivity<string, bool>
 {
-    public override Task<RideTransitionOutput> RunAsync(WorkflowActivityContext context, RideTransitionInput input) =>
-        RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Running, repository, publisher, nameof(StartRideActivity));
-}
+    private static readonly HttpClient HttpClient =
+        DaprClient.CreateInvokeHttpClient(AspireConstants.Projects.RidesApi);
 
-/// <summary>
-/// Transitions the ride to Failed — used in the compensation path.
-/// </summary>
-public sealed class StopRideActivity(IRideStateRepository repository, IRideStatusEventPublisher publisher)
-    : WorkflowActivity<RideTransitionInput, RideTransitionOutput>
-{
-    public override Task<RideTransitionOutput> RunAsync(WorkflowActivityContext context, RideTransitionInput input) =>
-        RideTransitionHelper.ExecuteAsync(context, input, RideStatus.Failed, repository, publisher, nameof(StopRideActivity));
+    public override async Task<bool> RunAsync(WorkflowActivityContext context, string rideId)
+    {
+        var httpResponse = await HttpClient.PostAsync($"/rides/{rideId}/start", null);
+        httpResponse.EnsureSuccessStatusCode();
+        return true;
+    }
 }
 
 /// <summary>

@@ -37,19 +37,13 @@ public sealed class ResolveChaosEventHandler(
             return false;
         }
 
-        var workflowEventName = command.EventType switch
-        {
-            "WeatherAlert"     => "WeatherCleared",
-            "MascotIntrusion"  => "MascotCleared",
-            "RideMalfunction"  => "SafetyOverride",
-            _ => throw new ArgumentException($"Unknown EventType '{command.EventType}'. Valid values: WeatherAlert, MascotIntrusion, RideMalfunction.", nameof(command))
-        };
+        var workflowEventName = "ChaosEventResolved";
 
         await workflowClient.RaiseEventAsync(instanceId, workflowEventName, command.EventId, cancellationToken);
 
         logger.LogInformation(
-            "Raised {WorkflowEvent} event on workflow {InstanceId} for ride {RideId} (chaos event {EventId}).",
-            workflowEventName, instanceId, command.RideId, command.EventId);
+            "Raised {WorkflowEvent} event on workflow {InstanceId} for ride {RideId} (chaos event {EventId}, type {EventType}).",
+            workflowEventName, instanceId, command.RideId, command.EventId, command.EventType);
 
         return true;
     }

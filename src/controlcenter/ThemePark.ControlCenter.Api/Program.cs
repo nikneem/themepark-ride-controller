@@ -21,6 +21,7 @@ using ThemePark.EventContracts.Events;
 using ThemePark.EventContracts.Serialization;
 using ThemePark.Rides.Infrastructure;
 using ThemePark.Shared;
+using ThemePark.Shared.Catalog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,25 +40,29 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 builder.Services.AddDaprWorkflow(options =>
 {
     options.RegisterWorkflow<RideWorkflow>();
+    options.RegisterActivity<CheckRideStatusActivity>();
+    options.RegisterActivity<CheckWeatherActivity>();
+    options.RegisterActivity<CheckMascotActivity>();
+    options.RegisterActivity<LoadPassengersActivity>();
+    options.RegisterActivity<StartRideActivity>();
+    options.RegisterActivity<PauseRideActivity>();
+    options.RegisterActivity<ResumeRideActivity>();
+    options.RegisterActivity<CompleteRideActivity>();
+    options.RegisterActivity<TriggerMaintenanceActivity>();
+    options.RegisterActivity<IssueRefundActivity>();
+    options.RegisterActivity<CleanupWorkflowActivity>();
+    options.RegisterActivity<RecordSessionSummaryActivity>();
+    // Legacy activities (kept for backward compat with old state-machine approach)
     options.RegisterActivity<StartPreFlightActivity>();
     options.RegisterActivity<StartLoadingActivity>();
     options.RegisterActivity<StartRunActivity>();
-    options.RegisterActivity<PauseRideActivity>();
-    options.RegisterActivity<ResumeRideActivity>();
     options.RegisterActivity<EnterMaintenanceActivity>();
     options.RegisterActivity<StartResumingActivity>();
-    options.RegisterActivity<CompleteRideActivity>();
     options.RegisterActivity<FailRideActivity>();
     options.RegisterActivity<ResetRideActivity>();
-    options.RegisterActivity<IssueRefundActivity>();
-    options.RegisterActivity<CheckWeatherActivity>();
     options.RegisterActivity<CheckMascotZoneActivity>();
     options.RegisterActivity<CheckMaintenanceStatusActivity>();
     options.RegisterActivity<CheckSafetySystemsActivity>();
-    options.RegisterActivity<StartRideActivity>();
-    options.RegisterActivity<StopRideActivity>();
-    options.RegisterActivity<CleanupWorkflowActivity>();
-    options.RegisterActivity<RecordSessionSummaryActivity>();
 });
 
 // Per-connection SSE channel manager — each connected client gets its own channel.
@@ -105,7 +110,7 @@ app.MapGet("/api/rides/{rideId}/status", async (string rideId, GetRideStatusHand
 
 app.MapPost("/api/rides/{rideId}/start", async (string rideId, StartWorkflowHandler handler, CancellationToken ct) =>
 {
-    var result = await handler.HandleAsync(new StartWorkflowCommand(rideId, []), ct);
+    var result = await handler.HandleAsync(new StartWorkflowCommand(rideId), ct);
     if (!result.IsSuccess)
     {
         return result.ErrorKind switch
@@ -216,16 +221,38 @@ app.MapPost("/events/ride-status-changed",
 
 app.MapPost("/events/weather-alert",
     [Topic(AspireConstants.DaprComponents.PubSub, "weather.alert", DeadLetterTopic = "weather.alert.deadletter")]
-    (WeatherAlertEvent evt, ILogger<Program> log) =>
+    async (WeatherAlertEvent evt, DaprClient daprClient, DaprWorkflowClient workflowClient, ILogger<Program> log) =>
     {
-        // TODO: WeatherAlertEvent has no direct rideId — it targets zones (evt.AffectedZones).
-        // To raise WeatherAlertReceived on all affected ride workflows we would need to query
-        // all active-workflow-* keys from the state store, which is not directly supported by
-        // Dapr's key-value API. A future implementation should maintain a zone→rideId index
-        // in the state store so this subscriber can fan-out to each affected workflow.
-        log.LogWarning(
-            "Weather alert ({Severity}) received for zones [{Zones}] — cannot target a specific workflow without zone→ride mapping. Acknowledging without action.",
-            evt.Severity, string.Join(", ", evt.AffectedZones));
+        // Map affected zones → ride IDs using the shared catalog.
+        var affectedRideIds = RideCatalog.All
+            .Where(r => evt.AffectedZones.Any(z => string.Equals(z, r.Zone, StringComparison.OrdinalIgnoreCase)))
+            .Select(r => r.RideId.ToString())
+            .ToList();
+
+        if (affectedRideIds.Count == 0)
+        {
+            log.LogInformation("Weather alert ({Severity}) — no rides in zones [{Zones}].",
+                evt.Severity, string.Join(", ", evt.AffectedZones));
+            return Results.Ok();
+        }
+
+        foreach (var rideId in affectedRideIds)
+        {
+            var instanceId = await daprClient.GetStateAsync<string?>(
+                AspireConstants.DaprComponents.StateStore, $"active-workflow-{rideId}");
+
+            if (string.IsNullOrEmpty(instanceId))
+            {
+                log.LogDebug("Weather alert — no active workflow for ride {RideId}, skipping.", rideId);
+                continue;
+            }
+
+            await workflowClient.RaiseEventAsync(instanceId, "WeatherAlertReceived", evt.Severity.ToString());
+            log.LogInformation(
+                "Raised WeatherAlertReceived ({Severity}) on workflow {InstanceId} for ride {RideId}.",
+                evt.Severity, instanceId, rideId);
+        }
+
         return Results.Ok();
     });
 
