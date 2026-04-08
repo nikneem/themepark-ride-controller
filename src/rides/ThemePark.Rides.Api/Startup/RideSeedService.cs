@@ -11,10 +11,13 @@ namespace ThemePark.Rides.Api.Startup;
 /// are never declared inline in service code.
 /// Rides whose key already exists are skipped to preserve operational state across restarts.
 /// </summary>
-public sealed class RideSeedService(IRideStateStore store, ILogger<RideSeedService> logger) : IHostedService
+public sealed class RideSeedService(IServiceScopeFactory scopeFactory, ILogger<RideSeedService> logger) : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var store = scope.ServiceProvider.GetRequiredService<IRideStateStore>();
+
         foreach (var info in RideSeedData.All)
         {
             var rideId = info.RideId.ToString();

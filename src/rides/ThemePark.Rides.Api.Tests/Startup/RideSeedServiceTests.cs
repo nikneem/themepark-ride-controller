@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using ThemePark.Rides.Infrastructure;
@@ -15,7 +16,16 @@ public sealed class RideSeedServiceTests
 
     public RideSeedServiceTests()
     {
-        _service = new RideSeedService(_store.Object, NullLogger<RideSeedService>.Instance);
+        var serviceProvider = new Mock<IServiceProvider>();
+        serviceProvider.Setup(p => p.GetService(typeof(IRideStateStore))).Returns(_store.Object);
+
+        var scope = new Mock<IServiceScope>();
+        scope.Setup(s => s.ServiceProvider).Returns(serviceProvider.Object);
+
+        var scopeFactory = new Mock<IServiceScopeFactory>();
+        scopeFactory.Setup(f => f.CreateScope()).Returns(scope.Object);
+
+        _service = new RideSeedService(scopeFactory.Object, NullLogger<RideSeedService>.Instance);
     }
 
     [Fact]
