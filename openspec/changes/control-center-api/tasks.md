@@ -4,7 +4,7 @@
 - [x] 1.2 Create `ThemePark.ControlCenter` domain class library and add to solution
 - [x] 1.3 Add Dapr SDK, Dapr Workflow, and .NET Aspire service defaults NuGet packages to both projects
 - [x] 1.4 Register the API project and its Dapr sidecar in `AppHost/Program.cs`
-- [ ] 1.5 Add Dapr state store and pub/sub component YAML files under `components/`
+- [x] 1.5 Add Dapr state store and pub/sub component YAML files under `components/`
 
 ## 2. Domain Models
 
@@ -65,6 +65,6 @@
 
 - [x] 9.1 Write xUnit integration tests for `GET /api/rides` and `GET /api/rides/{rideId}/status` using `WebApplicationFactory`
 - [x] 9.2 Write xUnit tests for `POST /api/rides/{rideId}/start` covering 202, 404, and 409 responses
-- [ ] 9.3 Write xUnit unit tests for `RideWorkflow` happy path using Dapr Workflow test host
-- [ ] 9.4 Write xUnit unit tests for pre-flight failure and compensation path
+- [x] 9.3 Write xUnit unit tests for `RideWorkflow` happy path using Dapr Workflow test host
+- [x] 9.4 Write xUnit unit tests for pre-flight failure and compensation path
 - [x] 9.5 Write xUnit unit tests for each pub/sub subscriber (mock `DaprClient`, verify `RaiseWorkflowEventAsync` calls)
