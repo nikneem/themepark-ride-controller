@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ThemePark.Maintenance.Api\ThemePark.Maintenance.Api.csproj" />
+    <ProjectReference Include="..\..\..\tests\ThemePark.Tests.Shared\ThemePark.Tests.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

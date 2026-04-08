@@ -58,5 +58,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ThemePark.Shared.Tests/ThemePark.Shared.Tests.csproj" />
+    <Project Path="tests/ThemePark.Tests.Shared/ThemePark.Tests.Shared.csproj" />
+    <Project Path="tests/ThemePark.IntegrationTests/ThemePark.IntegrationTests.csproj" />
   </Folder>
 </Solution>

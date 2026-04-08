@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ThemePark.Queue\ThemePark.Queue.csproj" />
     <ProjectReference Include="..\ThemePark.Queue.Api\ThemePark.Queue.Api.csproj" />
+    <ProjectReference Include="..\..\..\tests\ThemePark.Tests.Shared\ThemePark.Tests.Shared.csproj" />
   </ItemGroup>
 
 </Project>

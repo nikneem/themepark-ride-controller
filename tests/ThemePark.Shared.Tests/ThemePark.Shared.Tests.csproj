@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ThemePark.Shared\ThemePark.Shared.csproj" />
+    <ProjectReference Include="..\ThemePark.Tests.Shared\ThemePark.Tests.Shared.csproj" />
   </ItemGroup>
 
 </Project>

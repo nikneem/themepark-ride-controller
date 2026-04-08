@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ThemePark.ControlCenter\ThemePark.ControlCenter.csproj" />
     <ProjectReference Include="..\ThemePark.ControlCenter.Api\ThemePark.ControlCenter.Api.csproj" />
+    <ProjectReference Include="..\..\..\tests\ThemePark.Tests.Shared\ThemePark.Tests.Shared.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,22 +1,22 @@
 ## 1. Shared Test Infrastructure
 
-- [ ] 1.1 Create `ThemePark.Tests.Shared` class library project and add it to the solution
-- [ ] 1.2 Add Bogus NuGet package to `ThemePark.Tests.Shared` and implement `PassengerFaker` with name, age [5–90], and unique `RidePassId` generation; support `BOGUS_SEED` environment variable for deterministic CI output
-- [ ] 1.3 Implement `RefundAssertions` custom xUnit assertion helper in `ThemePark.Tests.Shared` with `AssertAllPassengersRefunded(IEnumerable<Passenger> passengers, IEnumerable<RefundRecord> refunds)` method
-- [ ] 1.4 Add `ThemePark.Tests.Shared` project reference to all 7 `ThemePark.<Service>.Tests` projects
+- [x] 1.1 Create `ThemePark.Tests.Shared` class library project and add it to the solution
+- [x] 1.2 Add Bogus NuGet package to `ThemePark.Tests.Shared` and implement `PassengerFaker` with name, age [5–90], and unique `RidePassId` generation; support `BOGUS_SEED` environment variable for deterministic CI output
+- [x] 1.3 Implement `RefundAssertions` custom xUnit assertion helper in `ThemePark.Tests.Shared` with `AssertAllPassengersRefunded(IEnumerable<Passenger> passengers, IEnumerable<RefundRecord> refunds)` method
+- [x] 1.4 Add `ThemePark.Tests.Shared` project reference to all 7 `ThemePark.<Service>.Tests` projects
 
 ## 2. ITimeProvider Abstraction
 
-- [ ] 2.1 Define `ITimeProvider` interface with `Task DelayAsync(TimeSpan duration, CancellationToken ct)` in the appropriate shared production library
-- [ ] 2.2 Implement `SystemTimeProvider` (production implementation wrapping `Task.Delay`) and register it in each service's DI container
-- [ ] 2.3 Implement `FakeTimeProvider` in `ThemePark.Tests.Shared` using `Microsoft.Extensions.TimeProvider.Testing` that advances time programmatically for use in timeout tests
+- [x] 2.1 Define `ITimeProvider` interface with `Task DelayAsync(TimeSpan duration, CancellationToken ct)` in the appropriate shared production library
+- [x] 2.2 Implement `SystemTimeProvider` (production implementation wrapping `Task.Delay`) and register it in each service's DI container
+- [x] 2.3 Implement `FakeTimeProvider` in `ThemePark.Tests.Shared` using `Microsoft.Extensions.TimeProvider.Testing` that advances time programmatically for use in timeout tests
 
 ## 3. Integration Test Project
 
-- [ ] 3.1 Create `ThemePark.IntegrationTests` xUnit project and add it to the solution
-- [ ] 3.2 Add `Aspire.Hosting.Testing`, Moq, and Bogus NuGet packages to `ThemePark.IntegrationTests`; add reference to `ThemePark.Tests.Shared`
-- [ ] 3.3 Implement `RideWorkflowTestHarness` with `StartRideAsync(rideId, passengers)`, `GetStateAsync(rideId)`, and `WaitForStateAsync(rideId, targetState, timeout)` (throws `WorkflowStateTimeoutException` on timeout)
-- [ ] 3.4 Implement `ChaosEventInjector` with typed methods for `WeatherMild`, `WeatherSevere`, `MascotIntrusion`, `MechanicalFailure`, `ClearWeather`, `ClearIntrusion`, and `ApproveMaintenance` events
+- [x] 3.1 Create `ThemePark.IntegrationTests` xUnit project and add it to the solution
+- [x] 3.2 Add `Aspire.Hosting.Testing`, Moq, and Bogus NuGet packages to `ThemePark.IntegrationTests`; add reference to `ThemePark.Tests.Shared`
+- [x] 3.3 Implement `RideWorkflowTestHarness` with `StartRideAsync(rideId, passengers)`, `GetStateAsync(rideId)`, and `WaitForStateAsync(rideId, targetState, timeout)` (throws `WorkflowStateTimeoutException` on timeout)
+- [x] 3.4 Implement `ChaosEventInjector` with typed methods for `WeatherMild`, `WeatherSevere`, `MascotIntrusion`, `MechanicalFailure`, `ClearWeather`, `ClearIntrusion`, and `ApproveMaintenance` events
 
 ## 4. Integration Test Scenarios
 
