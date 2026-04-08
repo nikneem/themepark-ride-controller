@@ -15,7 +15,7 @@ export class SseService implements OnDestroy {
 
   connect(): void {
     this.disconnect();
-    this.eventSource = new EventSource('/api/events/stream');
+    this.eventSource = new EventSource('/controlcenter/events/stream');
 
     this.eventSource.addEventListener('ride-status-changed', (event: MessageEvent) => {
       try {

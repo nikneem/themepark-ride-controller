@@ -8,27 +8,27 @@ export class RidesService {
   private http = inject(HttpClient);
 
   getRides(): Observable<RideDto[]> {
-    return this.http.get<RideDto[]>('/api/rides');
+    return this.http.get<RideDto[]>('/controlcenter/rides');
   }
 
   getRideStatus(rideId: string): Observable<RideStatusResponse> {
-    return this.http.get<RideStatusResponse>(`/api/rides/${rideId}/status`);
+    return this.http.get<RideStatusResponse>(`/controlcenter/rides/${rideId}/status`);
   }
 
   startRide(rideId: string): Observable<StartRideResponse> {
-    return this.http.post<StartRideResponse>(`/api/rides/${rideId}/start`, {});
+    return this.http.post<StartRideResponse>(`/controlcenter/rides/${rideId}/start`, {});
   }
 
   approveMaintenance(rideId: string): Observable<void> {
-    return this.http.post<void>(`/api/rides/${rideId}/maintenance/approve`, {});
+    return this.http.post<void>(`/controlcenter/rides/${rideId}/maintenance/approve`, {});
   }
 
   resolveEvent(rideId: string, eventId: string, eventType: string): Observable<void> {
-    return this.http.post<void>(`/api/rides/${rideId}/events/${eventId}/resolve?eventType=${eventType}`, {});
+    return this.http.post<void>(`/controlcenter/rides/${rideId}/events/${eventId}/resolve?eventType=${eventType}`, {});
   }
 
   getRideHistory(rideId: string): Observable<RideHistoryEntry[]> {
-    return this.http.get<RideHistoryEntry[]>(`/api/rides/${rideId}/history`);
+    return this.http.get<RideHistoryEntry[]>(`/controlcenter/rides/${rideId}/history`);
   }
 
   simulateMalfunction(rideId: string): Observable<void> {
