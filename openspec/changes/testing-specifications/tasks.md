@@ -35,12 +35,12 @@
 
 ## 6. Unit Test Conventions per Service
 
-- [ ] 6.1 Add unit tests for all command and query handlers in `ThemePark.Rides.Tests` using Moq for dependencies and `PassengerFaker` for data; achieve ≥ 90 % handler coverage and 100 % domain/state-transition coverage
-- [ ] 6.2 Add unit tests for workflow activities in `ThemePark.Rides.Tests` using mocked Dapr client; achieve ≥ 80 % activity coverage
-- [ ] 6.3 Repeat handler, domain, and activity unit tests for all remaining 6 services (`Boarding`, `Passengers`, `Refunds`, `Notifications`, `Weather`, `Operator`) following the same coverage targets and naming convention
+- [x] 6.1 Add unit tests for all command and query handlers in `ThemePark.Rides.Tests` using Moq for dependencies and `PassengerFaker` for data; achieve ≥ 90 % handler coverage and 100 % domain/state-transition coverage
+- [x] 6.2 Add unit tests for workflow activities in `ThemePark.Rides.Tests` using mocked Dapr client; achieve ≥ 80 % activity coverage
+- [x] 6.3 Repeat handler, domain, and activity unit tests for all remaining 6 services (`Boarding`, `Passengers`, `Refunds`, `Notifications`, `Weather`, `Operator`) following the same coverage targets and naming convention
 
 ## 7. CI Pipeline Configuration
 
-- [ ] 7.1 Update CI pipeline to add a `unit-tests` stage that runs `dotnet test --filter "Category!=Integration"` on every push to any branch
-- [ ] 7.2 Update CI pipeline to add an `integration-tests` stage that runs `dotnet test --filter "Category=Integration"` only on pull-request merge to `main`
-- [ ] 7.3 Configure coverage reporting in CI: fail the `unit-tests` stage if handler coverage < 90 %, domain coverage < 100 %, or activity coverage < 80 %
+- [x] 7.1 Update CI pipeline to add a `unit-tests` stage that runs `dotnet test --filter "Category!=Integration"` on every push to any branch
+- [x] 7.2 Update CI pipeline to add an `integration-tests` stage that runs `dotnet test --filter "Category=Integration"` only on pull-request merge to `main`
+- [x] 7.3 Configure coverage reporting in CI: fail the `unit-tests` stage if handler coverage < 90 %, domain coverage < 100 %, or activity coverage < 80 %
