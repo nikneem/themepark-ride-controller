@@ -78,7 +78,6 @@ builder.Services.AddScoped<GetRideHistoryHandler>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseHttpsRedirection();
 
 // Registers the Dapr subscription endpoint (/dapr/subscribe).
 app.MapSubscribeHandler();

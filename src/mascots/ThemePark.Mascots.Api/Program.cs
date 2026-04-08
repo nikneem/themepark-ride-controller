@@ -23,7 +23,6 @@ builder.Services.AddHostedService<MascotMovementService>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseHttpsRedirection();
 
 app.MapGetMascots();
 app.MapClearMascot();

@@ -15,7 +15,6 @@ builder.Services.AddQueueModule();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseHttpsRedirection();
 
 // Endpoints
 app.MapGetQueue();

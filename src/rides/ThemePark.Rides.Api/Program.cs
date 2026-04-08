@@ -28,7 +28,6 @@ builder.Services.AddRidesModule();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseHttpsRedirection();
 
 // Vertical slice endpoints
 app.MapGetRide();

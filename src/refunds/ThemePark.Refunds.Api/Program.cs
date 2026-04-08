@@ -14,7 +14,6 @@ builder.Services.AddRefundsModule();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseHttpsRedirection();
 
 app.MapIssueRefund();
 app.MapGetRefundHistory();

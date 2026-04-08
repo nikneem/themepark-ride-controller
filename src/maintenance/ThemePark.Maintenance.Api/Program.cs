@@ -15,7 +15,6 @@ builder.Services.AddMaintenanceModule();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseHttpsRedirection();
 
 app.MapCreateMaintenanceRequest();
 app.MapCompleteMaintenanceRequest();

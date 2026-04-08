@@ -20,7 +20,6 @@ builder.Services.AddHostedService<WeatherSimulationBackgroundService>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.UseHttpsRedirection();
 
 GetCurrentWeatherEndpoint.Map(app);
 SimulateWeatherEndpoint.Map(app);
