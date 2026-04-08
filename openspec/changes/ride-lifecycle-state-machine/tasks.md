@@ -55,6 +55,6 @@
 
 ## 9. Integration Tests
 
-- [ ] 9.1 Write an integration test that executes a full ride session (`Idle → PreFlight → Loading → Running → Completed → Idle`) and asserts each intermediate status is persisted correctly to the Dapr state store
-- [ ] 9.2 Write an integration test that connects to `GET /api/events/stream`, triggers a state transition, and asserts the SSE message is received with the correct payload
-- [ ] 9.3 Write an integration test verifying that a client disconnecting from the SSE stream does not prevent subsequent clients from receiving events
+- [x] 9.1 Write an integration test that executes a full ride session (`Idle → PreFlight → Loading → Running → Completed → Idle`) and asserts each intermediate status is persisted correctly to the Dapr state store
+- [x] 9.2 Write an integration test that connects to `GET /api/events/stream`, triggers a state transition, and asserts the SSE message is received with the correct payload
+- [x] 9.3 Write an integration test verifying that a client disconnecting from the SSE stream does not prevent subsequent clients from receiving events

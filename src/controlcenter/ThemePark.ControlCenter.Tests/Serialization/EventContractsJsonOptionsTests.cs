@@ -48,7 +48,7 @@ public sealed class EventContractsJsonOptionsTests
         var json = JsonSerializer.Serialize(evt, EventContractsJsonOptions.Default);
 
         // Enum should appear as string "severe", not its integer value 2
-        Assert.DoesNotContain(":2", json);
+        Assert.DoesNotContain("\"severity\":2", json);
         Assert.Contains("\"severe\"", json);
     }
 
