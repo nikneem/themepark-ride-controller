@@ -15,7 +15,8 @@ public sealed class GetMaintenanceHistoryHandler(IMaintenanceStateStore stateSto
     {
         var ids = await stateStore.GetRideHistoryAsync(query.RideId, cancellationToken);
         if (ids.Count == 0)
-            return OperationResult<GetMaintenanceHistoryResponse>.NotFound();
+            return OperationResult<GetMaintenanceHistoryResponse>.Success(
+                new GetMaintenanceHistoryResponse(query.RideId, []));
 
         var items = new List<MaintenanceHistoryItem>(ids.Count);
         foreach (var id in ids)

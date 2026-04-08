@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 using ThemePark.ControlCenter.Features.GetAllRides;
-using ThemePark.Rides.Abstractions.DataTransferObjects;
 
 namespace ThemePark.ControlCenter.Tests.GetAllRides;
 
