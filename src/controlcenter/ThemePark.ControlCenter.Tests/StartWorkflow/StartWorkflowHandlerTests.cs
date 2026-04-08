@@ -32,7 +32,7 @@ public sealed class StartWorkflowHandlerTests
             .Returns(activeStatus);
 
         var result = await CreateHandler().HandleAsync(
-            new StartWorkflowCommand(RideId, []));
+            new StartWorkflowCommand(RideId));
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OperationErrorKind.Conflict, result.ErrorKind);
@@ -42,7 +42,7 @@ public sealed class StartWorkflowHandlerTests
     public async Task StartRide_InvalidRideIdFormat_ReturnsBadRequest()
     {
         var result = await CreateHandler().HandleAsync(
-            new StartWorkflowCommand("not-a-guid", []));
+            new StartWorkflowCommand("not-a-guid"));
 
         Assert.False(result.IsSuccess);
         Assert.Equal(OperationErrorKind.BadRequest, result.ErrorKind);

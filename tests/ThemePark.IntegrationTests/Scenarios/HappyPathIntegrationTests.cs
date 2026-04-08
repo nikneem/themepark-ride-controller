@@ -1,4 +1,3 @@
-using Aspire.Hosting.Testing;
 using ThemePark.IntegrationTests.Harness;
 using ThemePark.Shared.Catalog;
 using ThemePark.Shared.Enums;
@@ -7,20 +6,19 @@ using ThemePark.Tests.Shared.Fakers;
 namespace ThemePark.IntegrationTests.Scenarios;
 
 [Trait("Category", "Integration")]
-public sealed class HappyPathIntegrationTests : IClassFixture<DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost>>
+public sealed class HappyPathIntegrationTests : IClassFixture<AppHostFixture>
 {
-    private readonly DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> _factory;
+    private readonly AppHostFixture _fixture;
 
-    public HappyPathIntegrationTests(DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> factory)
+    public HappyPathIntegrationTests(AppHostFixture fixture)
     {
-        _factory = factory;
+        _fixture = fixture;
     }
 
     [Fact]
     public async Task StartRide_HappyPath_CompletesWithAllPassengersRecorded()
     {
-        await _factory.StartAsync();
-        var httpClient = _factory.CreateHttpClient("gateway");
+        var httpClient = _fixture.CreateHttpClient("gateway");
         var harness = new RideWorkflowTestHarness(httpClient);
         var rideId = RideCatalog.ThunderMountain.RideId.ToString();
 

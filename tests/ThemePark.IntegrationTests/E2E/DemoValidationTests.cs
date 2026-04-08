@@ -1,4 +1,3 @@
-using Aspire.Hosting.Testing;
 using System.Net.Http.Json;
 using ThemePark.IntegrationTests.Harness;
 using ThemePark.Shared.Catalog;
@@ -8,21 +7,20 @@ namespace ThemePark.IntegrationTests.E2E;
 
 [Trait("Category", "Integration")]
 [Collection("E2E")]
-public sealed class DemoValidationTests : IClassFixture<DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost>>
+public sealed class DemoValidationTests : IClassFixture<AppHostFixture>
 {
-    private readonly DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> _factory;
+    private readonly AppHostFixture _fixture;
 
-    public DemoValidationTests(DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> factory)
+    public DemoValidationTests(AppHostFixture fixture)
     {
-        _factory = factory;
+        _fixture = fixture;
     }
 
     /// <summary>Task 5.1: All 5 rides are Idle at suite start.</summary>
     [Fact]
     public async Task E2E_AllRidesIdle_AtSuiteStart()
     {
-        await _factory.StartAsync();
-        var httpClient = _factory.CreateHttpClient("gateway");
+        var httpClient = _fixture.CreateHttpClient("gateway");
         var harness = new RideWorkflowTestHarness(httpClient);
 
         foreach (var ride in RideCatalog.All)
@@ -36,8 +34,7 @@ public sealed class DemoValidationTests : IClassFixture<DistributedApplicationFa
     [Fact]
     public async Task E2E_ThunderMountain_FullDemoSequence_AllEventsRecordedInHistory()
     {
-        await _factory.StartAsync();
-        var httpClient = _factory.CreateHttpClient("gateway");
+        var httpClient = _fixture.CreateHttpClient("gateway");
         var harness = new RideWorkflowTestHarness(httpClient);
         var injector = new ChaosEventInjector(httpClient);
         var rideId = RideCatalog.ThunderMountain.RideId.ToString();

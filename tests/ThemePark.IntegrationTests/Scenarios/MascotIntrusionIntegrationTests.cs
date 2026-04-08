@@ -1,4 +1,3 @@
-using Aspire.Hosting.Testing;
 using ThemePark.IntegrationTests.Harness;
 using ThemePark.Shared.Catalog;
 using ThemePark.Shared.Enums;
@@ -6,20 +5,19 @@ using ThemePark.Shared.Enums;
 namespace ThemePark.IntegrationTests.Scenarios;
 
 [Trait("Category", "Integration")]
-public sealed class MascotIntrusionIntegrationTests : IClassFixture<DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost>>
+public sealed class MascotIntrusionIntegrationTests : IClassFixture<AppHostFixture>
 {
-    private readonly DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> _factory;
+    private readonly AppHostFixture _fixture;
 
-    public MascotIntrusionIntegrationTests(DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> factory)
+    public MascotIntrusionIntegrationTests(AppHostFixture fixture)
     {
-        _factory = factory;
+        _fixture = fixture;
     }
 
     [Fact]
     public async Task StartRide_MascotIntrusionInjected_PausesAndResumesToCompleted()
     {
-        await _factory.StartAsync();
-        var httpClient = _factory.CreateHttpClient("gateway");
+        var httpClient = _fixture.CreateHttpClient("gateway");
         var harness = new RideWorkflowTestHarness(httpClient);
         var injector = new ChaosEventInjector(httpClient);
         var rideId = RideCatalog.SplashCanyon.RideId.ToString();

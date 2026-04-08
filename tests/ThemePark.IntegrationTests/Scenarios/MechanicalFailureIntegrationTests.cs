@@ -1,4 +1,3 @@
-using Aspire.Hosting.Testing;
 using ThemePark.IntegrationTests.Harness;
 using ThemePark.Shared.Catalog;
 using ThemePark.Shared.Enums;
@@ -6,20 +5,19 @@ using ThemePark.Shared.Enums;
 namespace ThemePark.IntegrationTests.Scenarios;
 
 [Trait("Category", "Integration")]
-public sealed class MechanicalFailureIntegrationTests : IClassFixture<DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost>>
+public sealed class MechanicalFailureIntegrationTests : IClassFixture<AppHostFixture>
 {
-    private readonly DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> _factory;
+    private readonly AppHostFixture _fixture;
 
-    public MechanicalFailureIntegrationTests(DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> factory)
+    public MechanicalFailureIntegrationTests(AppHostFixture fixture)
     {
-        _factory = factory;
+        _fixture = fixture;
     }
 
     [Fact]
     public async Task StartRide_MechanicalFailureInjected_EntersMaintenanceAndResumesToCompleted()
     {
-        await _factory.StartAsync();
-        var httpClient = _factory.CreateHttpClient("gateway");
+        var httpClient = _fixture.CreateHttpClient("gateway");
         var harness = new RideWorkflowTestHarness(httpClient);
         var injector = new ChaosEventInjector(httpClient);
         var rideId = RideCatalog.HauntedMansion.RideId.ToString();

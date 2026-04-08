@@ -1,4 +1,3 @@
-using Aspire.Hosting.Testing;
 using System.Net.Http.Json;
 using ThemePark.IntegrationTests.Harness;
 using ThemePark.Shared.Catalog;
@@ -9,20 +8,19 @@ using ThemePark.Tests.Shared.Fakers;
 namespace ThemePark.IntegrationTests.Scenarios;
 
 [Trait("Category", "Integration")]
-public sealed class SevereWeatherIntegrationTests : IClassFixture<DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost>>
+public sealed class SevereWeatherIntegrationTests : IClassFixture<AppHostFixture>
 {
-    private readonly DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> _factory;
+    private readonly AppHostFixture _fixture;
 
-    public SevereWeatherIntegrationTests(DistributedApplicationFactory<Projects.ThemePark_Aspire_AppHost> factory)
+    public SevereWeatherIntegrationTests(AppHostFixture fixture)
     {
-        _factory = factory;
+        _fixture = fixture;
     }
 
     [Fact]
     public async Task StartRide_SevereWeatherDuringPreFlight_FailsAndRefundsAllPassengers()
     {
-        await _factory.StartAsync();
-        var httpClient = _factory.CreateHttpClient("gateway");
+        var httpClient = _fixture.CreateHttpClient("gateway");
         var harness = new RideWorkflowTestHarness(httpClient);
         var injector = new ChaosEventInjector(httpClient);
         var faker = new PassengerFaker();
