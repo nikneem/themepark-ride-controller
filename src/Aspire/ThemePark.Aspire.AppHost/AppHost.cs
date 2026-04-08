@@ -52,6 +52,17 @@ var mascotsApi = builder.AddProject<Projects.ThemePark_Mascots_Api>(AspireConsta
 var refundsApi = builder.AddProject<Projects.ThemePark_Refunds_Api>(AspireConstants.Projects.RefundsApi)
     .WithDaprSidecar(opts => opts.WithReference(pubSub).WithReference(stateStore));
 
+var frontendSourceFolder = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "..", "app"));
+EndpointReference? frontendEndpoint = null;
+
+if (Directory.Exists(frontendSourceFolder))
+{
+    var frontend = builder.AddJavaScriptApp("frontend", frontendSourceFolder)
+        .WithRunScript("start")
+        .WithHttpEndpoint(port: 4200, isProxied: false);
+    frontendEndpoint = frontend.GetEndpoint("http");
+}
+
 var gateway = builder.AddYarp("gateway")
     .WithHostPort(5000)
     .WithConfiguration(yarp =>
@@ -67,17 +78,9 @@ var gateway = builder.AddYarp("gateway")
         yarp.AddRoute("/weather/{**catch-all}", weatherApi.GetEndpoint("http"));
         yarp.AddRoute("/mascots/{**catch-all}", mascotsApi.GetEndpoint("http"));
         yarp.AddRoute("/refunds/{**catch-all}", refundsApi.GetEndpoint("http"));
-    });
 
-var frontendSourceFolder = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "..", "app"));
-if (Directory.Exists(frontendSourceFolder))
-{
-    builder.AddJavaScriptApp("frontend", frontendSourceFolder)
-        .WaitFor(gateway)
-        //.WithNpm(false)
-        .WithRunScript("start")
-        .WithHttpEndpoint(port: 4200, isProxied: false)
-        .WithEnvironment("ASPIRE_GATEWAY_URL", gateway.GetEndpoint("http"));
-}
+        if (frontendEndpoint is not null)
+            yarp.AddRoute("/{**catch-all}", frontendEndpoint);
+    });
 
 builder.Build().Run();
