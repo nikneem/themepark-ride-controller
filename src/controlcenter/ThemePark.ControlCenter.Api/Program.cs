@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Channels;
 using Dapr;
 using Dapr.Client;
+using ThemePark.ControlCenter.Domain;
 using ThemePark.ControlCenter.Features;
 using ThemePark.ControlCenter.Features.ApproveMaintenance;
 using ThemePark.ControlCenter.Features.GetAllRides;
@@ -12,6 +12,7 @@ using ThemePark.ControlCenter.Features.ResolveChaosEvent;
 using ThemePark.ControlCenter.Features.StartWorkflow;
 using ThemePark.ControlCenter.Infrastructure;
 using ThemePark.ControlCenter.PubSub;
+using ThemePark.ControlCenter.Sse;
 using ThemePark.ControlCenter.Workflow;
 using Dapr.Workflow;
 using ThemePark.ControlCenter.Workflow.Activities;
@@ -58,12 +59,8 @@ builder.Services.AddDaprWorkflow(options =>
     options.RegisterActivity<RecordSessionSummaryActivity>();
 });
 
-// Singleton channel that fans ride.status-changed pub/sub events to SSE clients.
-var statusChannel = Channel.CreateUnbounded<RideStatusChangedEvent>(
-    new UnboundedChannelOptions { SingleWriter = false, SingleReader = false });
-builder.Services.AddSingleton(statusChannel);
-builder.Services.AddSingleton(statusChannel.Writer);
-builder.Services.AddSingleton(statusChannel.Reader);
+// Per-connection SSE channel manager — each connected client gets its own channel.
+builder.Services.AddSingleton<SseConnectionManager>();
 
 // Infrastructure + pub/sub
 builder.Services.AddScoped<IRideStateRepository, RideStateRepository>();
@@ -161,9 +158,11 @@ app.MapGet("/api/rides/{rideId}/history", async (string rideId, GetRideHistoryHa
 .WithTags("Rides")
 .Produces<IReadOnlyList<RideHistoryEntry>>();
 
-// SSE endpoint — streams ride.status-changed events to connected frontend clients.
+// SSE endpoint — streams ride status events to connected frontend clients.
+// Each connection gets its own channel so a slow client cannot block others.
+// A 15-second heartbeat keeps idle connections alive through proxies.
 app.MapGet("/api/events/stream", async (
-    ChannelReader<RideStatusChangedEvent> reader,
+    SseConnectionManager sseManager,
     HttpResponse response,
     CancellationToken ct) =>
 {
@@ -171,11 +170,31 @@ app.MapGet("/api/events/stream", async (
     response.Headers.CacheControl = "no-cache";
     response.Headers.Connection = "keep-alive";
 
-    await foreach (var evt in reader.ReadAllAsync(ct))
+    var (connectionId, reader) = sseManager.AddConnection();
+    try
     {
-        var json = JsonSerializer.Serialize(evt, EventContractsJsonOptions.Default);
-        await response.WriteAsync($"data: {json}\n\n", ct);
-        await response.Body.FlushAsync(ct);
+        while (!ct.IsCancellationRequested)
+        {
+            using var heartbeatCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            heartbeatCts.CancelAfter(TimeSpan.FromSeconds(15));
+
+            try
+            {
+                var evt = await reader.ReadAsync(heartbeatCts.Token);
+                await response.WriteAsync($"data: {evt.Data}\n\n", ct);
+                await response.Body.FlushAsync(ct);
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                // Heartbeat timeout — send SSE comment to keep connection alive.
+                await response.WriteAsync(": heartbeat\n\n", ct);
+                await response.Body.FlushAsync(ct);
+            }
+        }
+    }
+    finally
+    {
+        sseManager.RemoveConnection(connectionId);
     }
 });
 
@@ -183,10 +202,11 @@ app.MapGet("/api/events/stream", async (
 
 app.MapPost("/events/ride-status-changed",
     [Topic("themepark-pubsub", "ride.status-changed", DeadLetterTopic = "ride.status-changed.deadletter")]
-    async (RideStatusChangedEvent evt, ChannelWriter<RideStatusChangedEvent> writer, ILogger<Program> log) =>
+    (RideStatusChangedEvent evt, SseConnectionManager sseManager, ILogger<Program> log) =>
     {
         log.LogInformation("Ride {RideId} status changed: {From} → {To}", evt.RideId, evt.PreviousStatus, evt.NewStatus);
-        await writer.WriteAsync(evt);
+        var json = JsonSerializer.Serialize(evt, EventContractsJsonOptions.Default);
+        sseManager.BroadcastEvent(new SseEvent("ride-status-changed", json, DateTimeOffset.UtcNow));
         return Results.Ok();
     });
 
