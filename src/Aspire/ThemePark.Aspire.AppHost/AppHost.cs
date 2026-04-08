@@ -1,3 +1,5 @@
+using Aspire.Hosting.Yarp.Transforms;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // RabbitMQ — fixed port so Dapr sidecar metadata can reference it directly.
@@ -21,19 +23,47 @@ var pubSub = builder.AddDaprComponent("themepark-pubsub", "pubsub.rabbitmq")
 
 // Helper to attach a Dapr sidecar referencing the shared pub/sub component.
 
-builder.AddProject<Projects.ThemePark_ControlCenter_Api>("controlcenter-api")
+var controlCenterApi = builder.AddProject<Projects.ThemePark_ControlCenter_Api>("controlcenter-api")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-builder.AddProject<Projects.ThemePark_Rides_Api>("rides-api")
+var ridesApi = builder.AddProject<Projects.ThemePark_Rides_Api>("rides-api")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-builder.AddProject<Projects.ThemePark_Queue_Api>("queue-api")
+var queueApi = builder.AddProject<Projects.ThemePark_Queue_Api>("queue-api")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-builder.AddProject<Projects.ThemePark_Maintenance_Api>("maintenance-api")
+var maintenanceApi = builder.AddProject<Projects.ThemePark_Maintenance_Api>("maintenance-api")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-builder.AddProject<Projects.ThemePark_Weather_Api>("weather-api")
+var weatherApi = builder.AddProject<Projects.ThemePark_Weather_Api>("weather-api")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-builder.AddProject<Projects.ThemePark_Mascots_Api>("mascots-api")
+var mascotsApi = builder.AddProject<Projects.ThemePark_Mascots_Api>("mascots-api")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
-builder.AddProject<Projects.ThemePark_Refunds_Api>("refunds-api")
+var refundsApi = builder.AddProject<Projects.ThemePark_Refunds_Api>("refunds-api")
     .WithDaprSidecar(opts => opts.WithReference(pubSub));
+
+var gateway = builder.AddYarp("gateway")
+    .WithHostPort(5000)
+    .WithConfiguration(yarp =>
+    {
+        // ControlCenter routes its handlers under /api/..., so strip /controlcenter and add /api
+        yarp.AddRoute("/controlcenter/{**catch-all}", controlCenterApi.GetEndpoint("http"))
+            .WithTransformPathRemovePrefix("/controlcenter")
+            .WithTransformPathPrefix("/api");
+
+        yarp.AddRoute("/rides/{**catch-all}", ridesApi.GetEndpoint("http"));
+        yarp.AddRoute("/queue/{**catch-all}", queueApi.GetEndpoint("http"));
+        yarp.AddRoute("/maintenance/{**catch-all}", maintenanceApi.GetEndpoint("http"));
+        yarp.AddRoute("/weather/{**catch-all}", weatherApi.GetEndpoint("http"));
+        yarp.AddRoute("/mascots/{**catch-all}", mascotsApi.GetEndpoint("http"));
+        yarp.AddRoute("/refunds/{**catch-all}", refundsApi.GetEndpoint("http"));
+    });
+
+var frontendSourceFolder = Path.GetFullPath(Path.Combine(builder.AppHostDirectory, "..", "..", "app"));
+if (Directory.Exists(frontendSourceFolder))
+{
+    builder.AddJavaScriptApp("frontend", frontendSourceFolder)
+        .WaitFor(gateway)
+        .WithNpm(false)
+        .WithRunScript("start")
+        .WithHttpEndpoint(port: 4200, isProxied: false)
+        .WithEnvironment("ASPIRE_GATEWAY_URL", gateway.GetEndpoint("http"));
+}
 
 builder.Build().Run();
