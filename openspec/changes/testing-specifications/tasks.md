@@ -20,18 +20,18 @@
 
 ## 4. Integration Test Scenarios
 
-- [ ] 4.1 Implement happy-path integration test: start ride with 20 passengers, assert `PreFlight → Loading → Running → Completed`, verify all 20 passengers recorded; tag `[Trait("Category", "Integration")]`
-- [ ] 4.2 Implement mild-weather integration test: inject `WeatherMild` while running, assert `Paused`, clear weather, assert `Running → Completed`; tag `[Trait("Category", "Integration")]`
-- [ ] 4.3 Implement mascot-intrusion integration test: inject `MascotIntrusion` while running, assert `Paused`, clear intrusion, assert `Running → Completed`; tag `[Trait("Category", "Integration")]`
-- [ ] 4.4 Implement mechanical-failure integration test: inject `MechanicalFailure`, assert `Maintenance`, send `ApproveMaintenance` + `maintenance.completed`, assert `Running → Completed`; tag `[Trait("Category", "Integration")]`
-- [ ] 4.5 Implement severe-weather pre-flight integration test: inject `WeatherSevere` during `PreFlight`, assert `Failed`, run `RefundAssertions.AssertAllPassengersRefunded`; tag `[Trait("Category", "Integration")]`
-- [ ] 4.6 Implement maintenance-timeout integration test: enter `Maintenance`, advance `FakeTimeProvider` beyond approval timeout without sending `ApproveMaintenance`, assert `Failed`, run `RefundAssertions.AssertAllPassengersRefunded`; tag `[Trait("Category", "Integration")]`
+- [x] 4.1 Implement happy-path integration test: start ride with 20 passengers, assert `PreFlight → Loading → Running → Completed`, verify all 20 passengers recorded; tag `[Trait("Category", "Integration")]`
+- [x] 4.2 Implement mild-weather integration test: inject `WeatherMild` while running, assert `Paused`, clear weather, assert `Running → Completed`; tag `[Trait("Category", "Integration")]`
+- [x] 4.3 Implement mascot-intrusion integration test: inject `MascotIntrusion` while running, assert `Paused`, clear intrusion, assert `Running → Completed`; tag `[Trait("Category", "Integration")]`
+- [x] 4.4 Implement mechanical-failure integration test: inject `MechanicalFailure`, assert `Maintenance`, send `ApproveMaintenance` + `maintenance.completed`, assert `Running → Completed`; tag `[Trait("Category", "Integration")]`
+- [x] 4.5 Implement severe-weather pre-flight integration test: inject `WeatherSevere` during `PreFlight`, assert `Failed`, run `RefundAssertions.AssertAllPassengersRefunded`; tag `[Trait("Category", "Integration")]`
+- [x] 4.6 Implement maintenance-timeout integration test: enter `Maintenance`, advance `FakeTimeProvider` beyond approval timeout without sending `ApproveMaintenance`, assert `Failed`, run `RefundAssertions.AssertAllPassengersRefunded`; tag `[Trait("Category", "Integration")]`
 
 ## 5. E2E Demo Validation Tests
 
-- [ ] 5.1 Implement E2E test step 1: assert all 5 rides are in `RideState.Idle` at suite start; tag `[Trait("Category", "Integration")]`
-- [ ] 5.2 Implement E2E test steps 2–5: start Thunder Mountain, assert `PreFlight → Loading → Running`, trigger mild weather, assert `Paused → Running`, trigger mascot intrusion, assert `Paused → Running`, trigger mechanical failure, assert `Maintenance`, approve, assert `Running`
-- [ ] 5.3 Implement E2E test steps 6–7: wait for `Completed`, query ride-history endpoint, assert all 12 expected events are present in chronological order
+- [x] 5.1 Implement E2E test step 1: assert all 5 rides are in `RideState.Idle` at suite start; tag `[Trait("Category", "Integration")]`
+- [x] 5.2 Implement E2E test steps 2–5: start Thunder Mountain, assert `PreFlight → Loading → Running`, trigger mild weather, assert `Paused → Running`, trigger mascot intrusion, assert `Paused → Running`, trigger mechanical failure, assert `Maintenance`, approve, assert `Running`
+- [x] 5.3 Implement E2E test steps 6–7: wait for `Completed`, query ride-history endpoint, assert all 12 expected events are present in chronological order
 
 ## 6. Unit Test Conventions per Service
 
