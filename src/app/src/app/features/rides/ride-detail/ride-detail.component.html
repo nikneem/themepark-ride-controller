@@ -16,6 +16,14 @@
           @if (status.status.toLowerCase() === 'maintenance') {
             <p-button label="Approve Maintenance" icon="pi pi-check" severity="warn" (onClick)="approveMaintenance()" />
           }
+          <p-button
+            label="Simulate Malfunction"
+            icon="pi pi-exclamation-triangle"
+            severity="danger"
+            [outlined]="true"
+            [loading]="simulating()"
+            (onClick)="simulateMalfunction()"
+          />
         </div>
       </div>
 
@@ -24,10 +32,22 @@
           <h3>⚠️ Active Chaos Events</h3>
           @for (event of status.activeChaosEvents; track event) {
             <div class="chaos-event">
-              <span>{{ event }}</span>
+              <span class="event-type-badge">{{ event }}</span>
               <p-button label="Resolve" icon="pi pi-check" severity="danger" size="small" (onClick)="resolveEvent(event)" />
             </div>
           }
+        </div>
+      }
+
+      @if (status.status.toLowerCase() === 'paused') {
+        <div class="chaos-card">
+          <h3>⚠️ Manual Override Controls</h3>
+          <p class="chaos-hint">Use these buttons to manually clear a known chaos event if the ride is paused.</p>
+          <div class="chaos-overrides">
+            <p-button label="Clear Weather Alert" icon="pi pi-sun" severity="warn" [outlined]="true" size="small" (onClick)="resolveEvent('WeatherAlert')" />
+            <p-button label="Clear Mascot Intrusion" icon="pi pi-user" severity="warn" [outlined]="true" size="small" (onClick)="resolveEvent('MascotIntrusion')" />
+            <p-button label="Safety Override (Malfunction)" icon="pi pi-shield" severity="danger" [outlined]="true" size="small" (onClick)="resolveEvent('RideMalfunction')" />
+          </div>
         </div>
       }
 
@@ -86,11 +106,15 @@
           <ng-template pTemplate="header">
             <tr>
               <th>Reason</th>
+              <th>Passengers</th>
+              <th>Processed</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-r>
             <tr>
               <td>{{ r.reason }}</td>
+              <td>{{ r.passengerCount ?? '—' }}</td>
+              <td>{{ r.processedAt ? (r.processedAt | date:'short') : '—' }}</td>
             </tr>
           </ng-template>
         </p-table>

@@ -3,7 +3,13 @@
 <div class="create-card">
   <h3>➕ Issue Refund</h3>
   <div class="create-form">
-    <input pInputText [(ngModel)]="newRideId" placeholder="Ride ID" />
+    <p-select
+      [options]="rides()"
+      [(ngModel)]="newRideId"
+      optionLabel="name"
+      optionValue="rideId"
+      placeholder="Select a ride"
+    />
     <input pInputText [(ngModel)]="newWorkflowId" placeholder="Workflow ID" />
     <input pInputText [(ngModel)]="newReason" placeholder="Refund reason" />
     <p-button label="Issue Refund" icon="pi pi-dollar" severity="warn" (onClick)="issueRefund()" />
@@ -17,16 +23,20 @@
       <tr>
         <th>Ride</th>
         <th>Reason</th>
+        <th>Passengers</th>
+        <th>Processed</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-r>
       <tr>
         <td>{{ r.rideName || r.rideId }}</td>
         <td>{{ r.reason }}</td>
+        <td>{{ r.passengerCount ?? '—' }}</td>
+        <td>{{ r.processedAt ? (r.processedAt | date:'short') : '—' }}</td>
       </tr>
     </ng-template>
     <ng-template pTemplate="emptymessage">
-      <tr><td colspan="2" class="empty-state">No refund records found</td></tr>
+      <tr><td colspan="4" class="empty-state">No refund records found</td></tr>
     </ng-template>
   </p-table>
 </div>

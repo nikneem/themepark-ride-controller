@@ -29,8 +29,8 @@
 <div class="simulate-card">
   <h3>🎮 Demo Mode – Simulate Intrusion</h3>
   <div class="simulate-form">
-    <input pInputText [(ngModel)]="intrusionMascotId" placeholder="Mascot ID" />
-    <input pInputText [(ngModel)]="intrusionRideId" placeholder="Target Ride ID" />
+    <p-select [options]="mascots()" [(ngModel)]="intrusionMascotId" optionLabel="name" optionValue="mascotId" placeholder="Select mascot" />
+    <p-select [options]="rides()" [(ngModel)]="intrusionRideId" optionLabel="name" optionValue="rideId" placeholder="Target ride" />
     <p-button label="Simulate" icon="pi pi-bolt" (onClick)="simulateIntrusion()" />
   </div>
 </div>

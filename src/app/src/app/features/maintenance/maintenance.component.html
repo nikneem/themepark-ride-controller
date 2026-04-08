@@ -3,7 +3,13 @@
 <div class="create-card">
   <h3>➕ New Maintenance Request</h3>
   <div class="create-form">
-    <input pInputText [(ngModel)]="newRideId" placeholder="Ride ID" />
+    <p-select
+      [options]="rides()"
+      [(ngModel)]="newRideId"
+      optionLabel="name"
+      optionValue="rideId"
+      placeholder="Select a ride"
+    />
     <input pInputText [(ngModel)]="newReason" placeholder="Reason for maintenance" />
     <p-button label="Create Request" icon="pi pi-plus" (onClick)="createRequest()" />
   </div>

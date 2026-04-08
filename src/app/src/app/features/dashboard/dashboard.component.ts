@@ -1,10 +1,11 @@
-import { Component, signal, computed, inject, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { PanelModule } from 'primeng/panel';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { StatusBadgeComponent } from '../../shared/components/status-badge/status-badge.component';
@@ -31,6 +32,7 @@ export class DashboardComponent implements OnInit {
   private weatherService = inject(WeatherService);
   private mascotsService = inject(MascotsService);
   private sseService = inject(SseService);
+  private destroyRef = inject(DestroyRef);
 
   rides = signal<RideDto[]>([]);
   weather = signal<WeatherResponse | null>(null);
@@ -44,7 +46,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
-    this.sseService.events$.subscribe(event => {
+    this.sseService.events$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(event => {
       if (event.type === 'ride-status-changed') this.loadRides();
     });
   }

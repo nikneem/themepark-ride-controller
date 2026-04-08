@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { PanelModule } from 'primeng/panel';
+import { TagModule } from 'primeng/tag';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { RidesService } from '../../../core/services/rides.service';
@@ -19,7 +20,7 @@ import { RefundBatchSummaryDto } from '../../../core/models/refund.model';
 @Component({
   selector: 'app-ride-detail',
   standalone: true,
-  imports: [CommonModule, ButtonModule, CardModule, TableModule, PanelModule, PageHeaderComponent, StatusBadgeComponent],
+  imports: [CommonModule, ButtonModule, CardModule, TableModule, PanelModule, TagModule, PageHeaderComponent, StatusBadgeComponent],
   templateUrl: './ride-detail.component.html',
   styleUrl: './ride-detail.component.scss'
 })
@@ -36,6 +37,7 @@ export class RideDetailComponent implements OnInit {
   history = signal<RideHistoryEntry[]>([]);
   maintenanceHistory = signal<MaintenanceHistoryItem[]>([]);
   refundHistory = signal<RefundBatchSummaryDto[]>([]);
+  simulating = signal(false);
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id') ?? '';
@@ -59,8 +61,17 @@ export class RideDetailComponent implements OnInit {
     this.ridesService.approveMaintenance(this.rideId()).subscribe({ next: () => this.reload() });
   }
 
-  resolveEvent(eventId: string): void {
-    this.ridesService.resolveEvent(this.rideId(), eventId, eventId).subscribe({ next: () => this.reload() });
+  /** eventType must be one of: WeatherAlert | MascotIntrusion | RideMalfunction */
+  resolveEvent(eventType: string): void {
+    this.ridesService.resolveEvent(this.rideId(), eventType, eventType).subscribe({ next: () => this.reload() });
+  }
+
+  simulateMalfunction(): void {
+    this.simulating.set(true);
+    this.ridesService.simulateMalfunction(this.rideId()).subscribe({
+      next: () => { this.simulating.set(false); this.reload(); },
+      error: () => this.simulating.set(false)
+    });
   }
 
   reload(): void {

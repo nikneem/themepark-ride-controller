@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { MaintenanceService } from '../../core/services/maintenance.service';
 import { RidesService } from '../../core/services/rides.service';
@@ -13,7 +14,7 @@ import { RideDto } from '../../core/models/ride.model';
 @Component({
   selector: 'app-maintenance',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule, SelectModule, PageHeaderComponent],
   templateUrl: './maintenance.component.html',
   styleUrl: './maintenance.component.scss'
 })

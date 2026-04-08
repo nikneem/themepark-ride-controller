@@ -15,11 +15,15 @@ export class StatusBadgeComponent {
   get severity(): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
     switch (this.status().toLowerCase()) {
       case 'running': return 'success';
+      case 'loading': return 'info';
+      case 'preflight': return 'info';
+      case 'resuming': return 'info';
+      case 'completed': return 'success';
       case 'paused': return 'warn';
-      case 'failed': return 'danger';
       case 'maintenance': return 'warn';
+      case 'failed': return 'danger';
       case 'idle': return 'secondary';
-      default: return 'info';
+      default: return 'secondary';
     }
   }
 }

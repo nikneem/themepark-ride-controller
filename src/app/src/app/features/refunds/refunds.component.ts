@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { RefundsService } from '../../core/services/refunds.service';
 import { RidesService } from '../../core/services/rides.service';
@@ -13,7 +14,7 @@ import { RideDto } from '../../core/models/ride.model';
 @Component({
   selector: 'app-refunds',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, TableModule, ButtonModule, InputTextModule, SelectModule, PageHeaderComponent],
   templateUrl: './refunds.component.html',
   styleUrl: './refunds.component.scss'
 })

@@ -30,4 +30,8 @@ export class RidesService {
   getRideHistory(rideId: string): Observable<RideHistoryEntry[]> {
     return this.http.get<RideHistoryEntry[]>(`/api/rides/${rideId}/history`);
   }
+
+  simulateMalfunction(rideId: string): Observable<void> {
+    return this.http.post<void>(`/rides/${rideId}/simulate-malfunction`, {});
+  }
 }

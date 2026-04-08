@@ -5,6 +5,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { PageHeaderComponent } from '../../shared/components/page-header/page-header.component';
 import { QueueService } from '../../core/services/queue.service';
 import { RidesService } from '../../core/services/rides.service';
@@ -18,7 +19,7 @@ interface RideQueueState extends QueueStateResponse {
 @Component({
   selector: 'app-queues',
   standalone: true,
-  imports: [CommonModule, FormsModule, TableModule, ButtonModule, InputNumberModule, InputTextModule, PageHeaderComponent],
+  imports: [CommonModule, FormsModule, TableModule, ButtonModule, InputNumberModule, InputTextModule, SelectModule, PageHeaderComponent],
   templateUrl: './queues.component.html',
   styleUrl: './queues.component.scss'
 })
