@@ -17,7 +17,7 @@
           <a [routerLink]="['/rides', ride.rideId]">
             <p-button label="Details" icon="pi pi-eye" severity="info" size="small" />
           </a>
-          @if (ride.status.toLowerCase() === 'idle') {
+          @if (ride.status?.toLowerCase() === 'idle') {
             <p-button label="Start" icon="pi pi-play" severity="success" size="small" (onClick)="startRide(ride.rideId)" />
           }
         </td>

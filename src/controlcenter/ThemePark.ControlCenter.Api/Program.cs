@@ -223,6 +223,12 @@ app.MapPost("/events/weather-alert",
     [Topic(AspireConstants.DaprComponents.PubSub, "weather.alert", DeadLetterTopic = "weather.alert.deadletter")]
     async (WeatherAlertEvent evt, DaprClient daprClient, DaprWorkflowClient workflowClient, ILogger<Program> log) =>
     {
+        if (evt.AffectedZones is null or { Length: 0 })
+        {
+            log.LogWarning("Weather alert ({Severity}) received with no affected zones, acknowledging.", evt.Severity);
+            return Results.Ok();
+        }
+
         // Map affected zones → ride IDs using the shared catalog.
         var affectedRideIds = RideCatalog.All
             .Where(r => evt.AffectedZones.Any(z => string.Equals(z, r.Zone, StringComparison.OrdinalIgnoreCase)))

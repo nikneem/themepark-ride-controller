@@ -1,4 +1,5 @@
 using ThemePark.Rides;
+using ThemePark.Rides.Abstractions.DataTransferObjects;
 using ThemePark.Rides.Api.Features.Rides;
 using ThemePark.Rides.Api.GetRide;
 using ThemePark.Rides.Api.PauseRide;
@@ -44,13 +45,15 @@ app.MapGet("/api/rides/{rideId}/status", async (string rideId, IRideStateReposit
     return Results.Ok(new { rideId, status = status.ToString() });
 });
 
-app.MapGet("/api/rides", async (IRideStateRepository repo, CancellationToken ct) =>
+app.MapGet("/api/rides", async (IRideStateStore store, CancellationToken ct) =>
 {
     var rides = ThemePark.Shared.Catalog.RideCatalog.All;
     var results = await Task.WhenAll(rides.Select(async r =>
     {
-        var status = await repo.GetStatusAsync(r.RideId.ToString(), ct);
-        return new { r.RideId, r.Name, r.Capacity, r.Zone, status = status.ToString() };
+        var state = await store.GetAsync(r.RideId.ToString(), ct);
+        return state is not null
+            ? new RideStateDto(state.RideId, state.Name, state.OperationalStatus.ToString(), state.Capacity, state.CurrentPassengerCount, state.PauseReason)
+            : new RideStateDto(r.RideId, r.Name, RideStatus.Idle.ToString(), r.Capacity, 0, null);
     }));
     return Results.Ok(results);
 });

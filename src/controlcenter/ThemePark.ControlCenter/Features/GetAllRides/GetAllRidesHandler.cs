@@ -1,6 +1,7 @@
 using Dapr.Client;
 using Microsoft.Extensions.Logging;
 using ThemePark.Aspire.ServiceDefaults;
+using ThemePark.ControlCenter.Features;
 using ThemePark.Rides.Abstractions.DataTransferObjects;
 
 namespace ThemePark.ControlCenter.Features.GetAllRides;
@@ -11,7 +12,7 @@ namespace ThemePark.ControlCenter.Features.GetAllRides;
 /// </summary>
 public sealed class GetAllRidesHandler(DaprClient daprClient, ILogger<GetAllRidesHandler> logger)
 {
-    public async Task<IReadOnlyList<RideStateDto>> HandleAsync(
+    public async Task<IReadOnlyList<RideDto>> HandleAsync(
         GetAllRidesQuery query,
         CancellationToken cancellationToken = default)
     {
@@ -23,7 +24,7 @@ public sealed class GetAllRidesHandler(DaprClient daprClient, ILogger<GetAllRide
                 "/api/rides",
                 cancellationToken);
 
-            return rides ?? [];
+            return rides?.Select(r => new RideDto(r.RideId, r.Name, r.OperationalStatus)).ToList() ?? [];
         }
         catch (Exception ex)
         {
