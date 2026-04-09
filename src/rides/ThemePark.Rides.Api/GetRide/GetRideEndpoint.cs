@@ -8,7 +8,7 @@ public static class GetRideEndpoint
 {
     public static IEndpointRouteBuilder MapGetRide(this IEndpointRouteBuilder routes)
     {
-        routes.MapGet("/rides/{rideId}", async (string rideId, GetRideHandler handler, CancellationToken ct) =>
+        routes.MapGet("/api/rides/{rideId}", async (string rideId, GetRideHandler handler, CancellationToken ct) =>
         {
             var result = await handler.HandleAsync(new GetRideQuery(rideId), ct);
             return result.IsSuccess
