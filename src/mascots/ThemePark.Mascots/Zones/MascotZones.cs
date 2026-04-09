@@ -1,3 +1,5 @@
+using ThemePark.Shared.Domain;
+
 namespace ThemePark.Mascots.Zones;
 
 public static class MascotZones
@@ -11,24 +13,23 @@ public static class MascotZones
     public static readonly string[] AllZones = [ParkCentral, ZoneA, ZoneB, ZoneC, Backstage];
     public static readonly string[] RestrictedZones = [ZoneA, ZoneB, ZoneC];
 
-    // Well-known ride GUIDs for each restricted zone
-    public static readonly Guid RideAId = new("a0000000-0000-0000-0000-000000000001");
-    public static readonly Guid RideBId = new("b0000000-0000-0000-0000-000000000002");
-    public static readonly Guid RideCId = new("c0000000-0000-0000-0000-000000000003");
-
+    // Representative ride ID per zone (used when publishing mascot-in-restricted-zone events)
     private static readonly Dictionary<string, Guid> ZoneToRide = new(StringComparer.OrdinalIgnoreCase)
     {
-        [ZoneA] = RideAId,
-        [ZoneB] = RideBId,
-        [ZoneC] = RideCId,
+        [ZoneA] = RideSeedData.ThunderMountain.RideId,
+        [ZoneB] = RideSeedData.SplashCanyon.RideId,
+        [ZoneC] = RideSeedData.HauntedMansion.RideId,
     };
 
-    // Mapping from targetRideId slug (e.g. "ride-zone-a") to zone name
+    // Maps each canonical ride GUID (as string) to its zone — used to resolve the
+    // targetRideId sent by the frontend when simulating a mascot intrusion.
     private static readonly Dictionary<string, string> RideIdToZone = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["ride-zone-a"] = ZoneA,
-        ["ride-zone-b"] = ZoneB,
-        ["ride-zone-c"] = ZoneC,
+        [RideSeedData.ThunderMountain.RideId.ToString()] = ZoneA,
+        [RideSeedData.SpaceCoaster.RideId.ToString()]    = ZoneA,
+        [RideSeedData.DragonsLair.RideId.ToString()]     = ZoneA,
+        [RideSeedData.SplashCanyon.RideId.ToString()]    = ZoneB,
+        [RideSeedData.HauntedMansion.RideId.ToString()]  = ZoneC,
     };
 
     public static bool IsRestrictedZone(string zone) =>
